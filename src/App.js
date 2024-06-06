@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { Login } from './Pages/Login.js'
+import { Dashboard } from './Pages/Dashboard.js'
+import { Calendar } from './Pages/Calendar.js'
+import { FormsPage } from './Pages/Forms.js'
+import { Sidebar } from './Sidebar';
+import { Teachers } from './Pages/Teachers.js';
+import { Resources } from './Pages/Resources.js';
 
-function App() {
+
+export const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="flex">
+        <Sidebar />
+        <div className="w-full">
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/calendar" element={<Calendar />} />
+            <Route path="/forms" element={<FormsPage />} />
+            <Route path="/teachers" element={<Teachers />} />
+            <Route path="/resources" element={<Resources />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
   );
 }
-
-export default App;
