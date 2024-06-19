@@ -15,6 +15,9 @@ module.exports = {
       'silver': '#ecebff',
       'bubble-gum': '#ff77e9',
       'bermuda': '#78dcca',
+      'dark-blue-900': '#000032',
+      'dark-blue-700': '#181948',
+      'blue-900':'#000032'
     },
   },
   plugins: [],

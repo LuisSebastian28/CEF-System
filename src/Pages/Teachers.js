@@ -1,9 +1,4 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faCalendarAlt, faFileAlt } from '@fortawesome/free-solid-svg-icons';
-import './Teachers.css';
-
-// Assuming you have the images stored in the public directory
 const teachersData = [
   { name: 'John Doe', subject: 'Math', location: 'Los Angeles, CA', image: 'path/to/john_doe_image.png' },
   { name: 'Jane Appleseed', subject: 'English', location: 'New York, NY', image: 'path/to/jane_appleseed_image.png' },

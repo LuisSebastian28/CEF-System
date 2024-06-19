@@ -1,7 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faCalendarAlt, faFileAlt } from '@fortawesome/free-solid-svg-icons';
-import './Dashboard.css';
 
 export const Dashboard = () => {
   return (

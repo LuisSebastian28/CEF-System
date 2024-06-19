@@ -1,5 +1,4 @@
 import React from 'react';
-import './Resources.css';
 
 const resourcesData = [
   { title: 'The Great Gatsby', author: 'F. Scott Fitzgerald', category: 'Fiction', action: 'Download', image: 'path/to/great_gatsby_image.png' },

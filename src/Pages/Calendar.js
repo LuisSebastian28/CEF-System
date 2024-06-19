@@ -1,8 +1,5 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTachometerAlt, faCalendarAlt, faFileAlt, faChartLine, faChalkboardTeacher, faLightbulb, faUpload, faBook, faUser, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
-import { Sidebar } from '../Sidebar';
-import './Calendar.css';
+
 
 export const Calendar = () => {
   return (
