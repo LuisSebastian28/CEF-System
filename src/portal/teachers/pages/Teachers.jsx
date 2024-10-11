@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { startFetchUsers } from '../../store/portal/users/userThunks';
+import { startFetchUsers } from '../../../store/portal/users/userThunks';
 
 
 
 export const Teachers = () => {
 
   const dispatch = useDispatch();
-  const { users, status, error } = useSelector((state) => state.users);
+  const { users } = useSelector((state) => state.users);
 
   useEffect(() => {
     dispatch(startFetchUsers());

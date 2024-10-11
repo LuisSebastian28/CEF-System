@@ -1,7 +1,7 @@
 // portal/pages/Users.jsx
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { startFetchUsers, startAddUser, startUpdateUser, startDeleteUser } from '../../store/portal/users/userThunks'; // Asegúrate de que la ruta es correcta
+import { startFetchUsers, startAddUser, startUpdateUser, startDeleteUser } from '../../../store/portal/users/userThunks'; // Asegúrate de que la ruta es correcta
 import { Modal } from 'react-responsive-modal';
 import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

@@ -1,13 +1,13 @@
 import React from 'react'
 import { SideBar } from '../../ui/components/SideBar'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { Dashboard } from '../pages/Dashboard'
-import { Calendar } from '../pages/Calendar'
-import { Resources } from '../pages/Resources'
-import { Teachers } from '../pages/Teachers'
-import { Users } from '../pages/Users'
-import { Forms } from '../pages/Forms'
-import { Insights } from '../pages/Insights'
+import { Dashboard } from '../dashboard/pages/Dashboard'
+import { Calendar } from '../calendar/pages/Calendar'
+import { Resources } from '../resourcesCef/pages/Resources'
+import { Teachers } from '../teachers/pages/Teachers'
+import { Users } from '../users/pages/Users'
+import { Forms } from '../forms/pages/Forms'
+import { Insights } from '../insights/pages/Insights'
 
 export const PortalRoutes = () => {
     return (
