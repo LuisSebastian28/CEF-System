@@ -1,6 +1,6 @@
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, updateProfile} from "firebase/auth";
 import { FirebaseAuth, FirebaseDB } from "./firebaseConfig";
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, getDoc } from 'firebase/firestore';
 
 
 
@@ -126,3 +126,58 @@ export const deleteUserFromFirestore = async (userId) => {
         return { ok: false, errorMessage: error.message };
     }
 };
+
+
+// Obtener datos de un usuario dado una referencia (path)
+export const getUserFromReference = async (userRef) => {
+    try {
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+            return { ok: true, user: { id: userDoc.id, ...userDoc.data() } };
+        } else {
+            return { ok: false, errorMessage: 'Usuario no encontrado.' };
+        }
+    } catch (error) {
+        console.error("Error al obtener el usuario: ", error);
+        return { ok: false, errorMessage: error.message };
+    }
+};
+
+// Obtener todos los 5-Day Clubs de Firestore
+export const getFivedayclubsFromFirestore = async () => {
+    try {
+        const clubsRef = collection(FirebaseDB, "fivedayclubs");
+        const q = query(clubsRef, orderBy("date", "desc")); // Ordenar por fecha descendente
+        const querySnapshot = await getDocs(q);
+        const fivedayclubs = [];
+        querySnapshot.forEach((doc) => {
+            fivedayclubs.push({ id: doc.id, ...doc.data() });
+        });
+        return { ok: true, fivedayclubs };
+    } catch (error) {
+        console.error("Error fetching 5-Day Clubs: ", error);
+        return { ok: false, errorMessage: error.message };
+    }
+};
+
+// Obtener asistentes de un 5-Day Club específico desde Firestore
+export const getAttendeesForFivedayclub = async (clubId) => {
+    try {
+        const attendanceRef = collection(FirebaseDB, `fivedayclubs/${clubId}/attendance`);
+        const querySnapshot = await getDocs(attendanceRef);
+        const attendees = [];
+        querySnapshot.forEach((doc) => {
+            attendees.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Devolver la lista de asistentes y el total de asistentes
+        return { ok: true, attendees, totalAttendees: attendees.length };
+    } catch (error) {
+        console.error("Error fetching attendees: ", error);
+        return { ok: false, errorMessage: error.message };
+    }
+};
+// (Opcional) Agregar más funciones según tus necesidades
+// export const addFivedayclubToFirestore = async (fivedayclub) => { /* ... */ };
+// export const updateFivedayclubInFirestore = async (id, data) => { /* ... */ };
+// export const deleteFivedayclubFromFirestore = async (id) => { /* ... */ };
