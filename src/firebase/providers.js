@@ -299,3 +299,14 @@ export const deleteAttendeeFromFirestore = async (clubId, attendeeId) => {
     }
   };
   
+
+
+  export const addEventToFirestore = async (eventData) => {
+    try {
+        const docRef = await addDoc(collection(FirebaseDB, "events"), eventData);
+        return { ok: true, event: { id: docRef.id, ...eventData } };
+    } catch (error) {
+        console.error("Error adding event: ", error);
+        return { ok: false, errorMessage: error.message };
+    }
+};

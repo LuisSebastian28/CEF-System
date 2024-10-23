@@ -1,6 +1,6 @@
 
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import logo from '../../assets/images/logo2.png';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,20 +10,22 @@ import { startLoginWithEmailPassword } from '../../store/auth/thunks';
 const formData = {
     email: '',
     password: ''
-  }
+}
 
 export const Login = ({ handleLogin }) => {
 
-    const {status, errorMessage}= useSelector(state => state.auth);
+    const { status, errorMessage } = useSelector(state => state.auth);
 
     const dispatch = useDispatch()
 
-    const {email, password, onInputChange} = useForm(formData)
+    const { email, password, onInputChange } = useForm(formData)
+
+    const location = useLocation();
 
     const navigate = useNavigate();
 
     const isAuthenticating = useMemo(
-        () => status === 'checking',[status]
+        () => status === 'checking', [status]
     )
 
 
@@ -38,8 +40,9 @@ export const Login = ({ handleLogin }) => {
         //     setError(error.message);
         // }
 
-        dispatch(startLoginWithEmailPassword({email, password}))
-
+        dispatch(startLoginWithEmailPassword({ email, password }))
+        const from = location.state?.from?.pathname || '/dashboard'; // Redirige a la última página o al dashboard
+        navigate(from);
     };
 
     return (

@@ -1,28 +1,27 @@
 import React from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { PortalRoutes } from '../portal/routes/PortalRoutes'
 import { useCheckOut } from '../hooks/useCheckOut'
 import { AuthRoutes } from '../auth/routes/AuthRoutes'
 
 export const CefRouter = () => {
+  const { status, isLoading } = useCheckOut();
+  const location = useLocation(); // Para guardar la ubicación actual
 
-  const { status } = useCheckOut()
-
-
+  if (isLoading) {
+    return <div>Loading...</div>; // Mostrar un indicador de carga mientras se verifica la autenticación
+  }
 
   return (
-    <>
-      <Routes>
-        {
-          (status === 'authenticated')
-            ? <Route path="/*" element={<PortalRoutes />} />
-            : <Route path="/auth/*" element={<AuthRoutes />} />
-        }
+    <Routes>
+      {
+        (status === 'authenticated')
+          ? <Route path="/*" element={<PortalRoutes />} />
+          : <Route path="/auth/*" element={<AuthRoutes />} />
+      }
 
-        <Route path='/*' element={<Navigate to='/auth/login' />} />
-
-
-      </Routes>
-    </>
+      {/* Si el usuario no está autenticado, redirigir al login */}
+      <Route path='/*' element={<Navigate to='/auth/login' state={{ from: location }} />} />
+    </Routes>
   )
 }

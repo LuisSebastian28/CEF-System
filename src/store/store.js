@@ -4,6 +4,7 @@ import { usersSlice } from "./portal/users/userSlice";
 import { fivedayclubsSlice } from "./portal/insights/fiveDayClubs/fiveDayClubsSlice";
 import { clubsSlice } from "./portal/clubs/clubsSlice";
 import { dashboardSlice } from "./portal/dashboard/dashboardSlice";
+import eventSlice from "./portal/calendar/calendarSlice";
 // import { eventSlice } from "./portal/forms/formsSlice";
 
 export const store = configureStore({
@@ -12,6 +13,7 @@ export const store = configureStore({
         users: usersSlice.reducer,
         // events: eventSlice.reducer,
         clubs: clubsSlice.reducer,
-        dashboard: dashboardSlice.reducer
+        dashboard: dashboardSlice.reducer,
+        events: eventSlice.reducer
     }
 })

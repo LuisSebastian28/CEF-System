@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { login, logout } from '../store/auth/authSlice'
 import { FirebaseAuth, FirebaseDB } from '../firebase/firebaseConfig'
@@ -6,30 +6,34 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore';
 
 export const useCheckOut = () => {
-
+    const [isLoading, setIsLoading] = useState(true); // Nuevo estado para el loading
     const { status } = useSelector(state => state.auth)
     const dispatch = useDispatch()
 
-    useEffect(()=>{
-            onAuthStateChanged(FirebaseAuth, async(user)=>{
-                if(!user) return dispatch(logout())
-                
-                const {uid, email, displayName, photoURL} = user
+    useEffect(() => {
+        onAuthStateChanged(FirebaseAuth, async (user) => {
+            if (!user) {
+                dispatch(logout());
+                setIsLoading(false); // Deja de estar cargando cuando no hay usuario
+                return;
+            }
 
-                const docRef = doc(FirebaseDB,'users',uid);
+            const { uid, email, displayName, photoURL } = user;
 
-                const docSnap = await getDoc(docRef);
+            const docRef = doc(FirebaseDB, 'users', uid);
+            const docSnap = await getDoc(docRef);
+            const userData = docSnap.data();
 
-                const userData = docSnap.data();
+            dispatch(login({
+                uid, email, displayName, photoURL
+            }));
 
+            setIsLoading(false); // Deja de estar cargando después de la verificación
+        });
+    }, [dispatch]);
 
-                dispatch(login({
-                    uid, email, displayName, photoURL
-                }))
-            })
-    },[])
-
-    return{
-        status
+    return {
+        status,
+        isLoading // Devuelve también el estado de loading
     }
 }
