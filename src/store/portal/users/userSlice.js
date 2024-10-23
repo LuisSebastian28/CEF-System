@@ -5,6 +5,7 @@ const initialState = {
     users: [],
     status: 'idle',
     error: null,
+    newClubAdded: false,
 };
 
 export const usersSlice = createSlice({
@@ -73,6 +74,11 @@ export const usersSlice = createSlice({
             state.status = 'failed';
             state.error = action.payload;
         },
+        createClubSuccess(state, action) {
+            state.status = "succeeded";
+            state.clubs.push(action.payload);
+            state.newClubAdded = true;  // Activamos el flag cuando se añade un nuevo club
+        },
     },
 });
 
@@ -91,6 +97,8 @@ export const {
     
     deleteUserStart,
     deleteUserSuccess,
-    deleteUserFailure
+    deleteUserFailure,
+
+    createClubSuccess
 } = usersSlice.actions;
 

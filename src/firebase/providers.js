@@ -181,3 +181,121 @@ export const getAttendeesForFivedayclub = async (clubId) => {
 // export const addFivedayclubToFirestore = async (fivedayclub) => { /* ... */ };
 // export const updateFivedayclubInFirestore = async (id, data) => { /* ... */ };
 // export const deleteFivedayclubFromFirestore = async (id) => { /* ... */ };
+
+// firebase/providers.js
+
+// Obtener todos los clubs de Firestore
+export const getClubsFromFirestore = async () => {
+    try {
+        const clubsRef = collection(FirebaseDB, "clubs"); // Cambia el nombre de la colección a "clubs"
+        const q = query(clubsRef, orderBy("date", "desc")); // Ordenar por fecha descendente
+        const querySnapshot = await getDocs(q);
+        const clubs = [];
+        querySnapshot.forEach((doc) => {
+            clubs.push({ id: doc.id, ...doc.data() });
+        });
+        return { ok: true, clubs };
+    } catch (error) {
+        console.error("Error fetching clubs: ", error);
+        return { ok: false, errorMessage: error.message };
+    }
+};
+
+
+// firebase/providers.js
+
+// Obtener asistentes de cualquier club (genérico para cualquier tipo de club)
+export const getAttendeesForClub = async (clubId) => {
+    try {
+        const attendanceRef = collection(FirebaseDB, `clubs/${clubId}/attendance`); // Cambiar la ruta a "clubs"
+        const querySnapshot = await getDocs(attendanceRef);
+        const attendees = [];
+        querySnapshot.forEach((doc) => {
+            attendees.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Devolver la lista de asistentes y el total de asistentes
+        return { ok: true, attendees, totalAttendees: attendees.length };
+    } catch (error) {
+        console.error("Error fetching attendees: ", error);
+        return { ok: false, errorMessage: error.message };
+    }
+};
+
+// Función para añadir un nuevo club a Firestore
+export const addClubToFirestore = async (clubData) => {
+    console.log(clubData)
+    try {
+      const docRef = await addDoc(collection(FirebaseDB, "clubs"), clubData);
+      return { ok: true, club: { id: docRef.id, ...clubData } };
+    } catch (error) {
+      console.error("Error creating club: ", error);
+      return { ok: false, errorMessage: error.message };
+    }
+  };
+
+
+// Función para eliminar un club de Firestore
+export const deleteClubFromFirestore = async (clubId) => {
+    try {
+      const clubDocRef = doc(FirebaseDB, `clubs/${clubId}`);
+      await deleteDoc(clubDocRef);
+      return { ok: true };
+    } catch (error) {
+      console.error("Error deleting club:", error);
+      return { ok: false, errorMessage: error.message };
+    }
+  };
+
+  export const updateClubInFirestore = async (clubId, updatedData) => {
+    try {
+      // Referencia al documento del club específico
+      const clubDocRef = doc(FirebaseDB, "clubs", clubId);
+  
+      // Actualizar el documento en Firestore con los nuevos datos
+      await updateDoc(clubDocRef, updatedData);
+  
+      return { ok: true };
+    } catch (error) {
+      console.error("Error updating club:", error);
+      return { ok: false, errorMessage: error.message };
+    }
+  };
+
+  // Función para agregar un asistente a un club en Firestore
+export const addAttendeeToFirestore = async (clubId, attendeeData) => {
+    console.log(clubId)
+    try {
+      const attendanceRef = collection(FirebaseDB, `clubs/${clubId}/attendance`); // Referencia a la subcolección de attendance
+      const docRef = await addDoc(attendanceRef, attendeeData); // Añadir el nuevo asistente
+      return { ok: true, id: docRef.id };
+    } catch (error) {
+      console.error('Error adding attendee:', error);
+      return { ok: false, errorMessage: error.message };
+    }
+  };
+
+  // Función para editar un asistente en Firestore
+export const editAttendeeInFirestore = async (clubId, attendeeId, attendeeData) => {
+    try {
+      const attendeeDocRef = doc(FirebaseDB, `clubs/${clubId}/attendance/${attendeeId}`); // Referencia al documento del asistente
+      await updateDoc(attendeeDocRef, attendeeData); // Actualizar el asistente
+      return { ok: true };
+    } catch (error) {
+      console.error('Error editing attendee:', error);
+      return { ok: false, errorMessage: error.message };
+    }
+  };
+  
+  // Función para eliminar un asistente de Firestore
+export const deleteAttendeeFromFirestore = async (clubId, attendeeId) => {
+    try {
+      const attendeeDocRef = doc(FirebaseDB, `clubs/${clubId}/attendance/${attendeeId}`); // Referencia al documento del asistente
+      await deleteDoc(attendeeDocRef); // Eliminar el asistente
+      return { ok: true };
+    } catch (error) {
+      console.error('Error deleting attendee:', error);
+      return { ok: false, errorMessage: error.message };
+    }
+  };
+  

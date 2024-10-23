@@ -9,7 +9,7 @@ const resourcesData = [
 
 export const Resources = () => {
   return (
-    <div className="flex h-screen bg-gray-200">
+    <div className="flex h-screen bg-gray-50">
       <div className="w-4/5 p-10">
         <div className="flex justify-between items-center mb-10">
           <h1 className="text-4xl font-bold">Resources</h1>

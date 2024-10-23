@@ -11,7 +11,7 @@ export const GoodNewsCampForm = () => (
       </div>
       <div className="col-span-1">
         <label htmlFor="time" className="block">Time</label>
-        <input type="text" id="time" className="w-full p-2 border rounded" placeholder="Enter time" />
+        <input type="time" id="time" className="w-full p-2 border rounded" placeholder="Enter time" />
       </div>
       <div className="col-span-1">
         <label htmlFor="phone" className="block">Phone</label>

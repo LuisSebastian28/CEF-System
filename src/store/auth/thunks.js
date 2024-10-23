@@ -7,19 +7,13 @@ export const startLoginWithEmailPassword = ({email, password}) =>{
         const result = await loginWithEmailPassword({email, password});
 
         if (!result.ok) return dispatch(logout(result));
-
         dispatch(login(result))
     }
 }
 
 export const startLogout = () => {
     return async (dispatch) => {
-       
-
-
         await logoutFirebase();
-
-
         dispatch(logout());
 
     }

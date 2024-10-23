@@ -88,7 +88,7 @@ export const Calendar = () => {
 
   return (
     <div className="h-screen flex flex-col p-4">
-      <h1 className="text-2xl font-bold mb-4">Calendario de Eventos</h1>
+      <h1 className="text-3xl font-bold mb-4">Calendario de Eventos</h1>
       <div className="flex justify-between mb-4">
         <Dialog open={isAddEventOpen} onOpenChange={setIsAddEventOpen}>
           <DialogTrigger asChild>

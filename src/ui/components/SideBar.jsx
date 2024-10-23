@@ -1,14 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTachometerAlt, faCalendarAlt, faChalkboardTeacher, faBook, faUser, faUserFriends, faFolder, faPager } from '@fortawesome/free-solid-svg-icons';
+import { faTachometerAlt, faCalendarAlt, faChalkboardTeacher, faBook, faUser, faUserFriends, faFolder, faPager, faSignOut } from '@fortawesome/free-solid-svg-icons';
 import logo from '../../assets/images/logo2.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { startLogout } from '../../store/auth/thunks';
 
 export const SideBar = () => {
     const dispatch = useDispatch();
-    const { displayName } = useSelector(state => state.auth);
+
 
     const onLogout = () => {
         console.log('logout');
@@ -16,11 +16,11 @@ export const SideBar = () => {
     };
 
     return (
-        <div className='sidebar fixed top-0 left-0 bg-dark-blue-900 text-white flex flex-col p-5 h-screen'>
+        <div className='sidebar fixed top-0 left-0 bg-dark-blue-900 text-white flex flex-col p-2 h-screen'>
             {/* Primera Sección: Logo y Usuario */}
             <div className='flex flex-col items-center mb-8'>
                 <img src={logo} alt="Logo" className='logo w-20 h-20 mb-3' />
-                <h2 className='text-xl font-semibold'>Hi, {displayName}</h2>
+                {/* <h2 className='text-xl font-semibold'>Hi, user</h2> */}
             </div>
 
             {/* Segunda Sección: Opciones de Navegación */}
@@ -58,7 +58,7 @@ export const SideBar = () => {
             {/* Tercera Sección: Botón de Logout */}
             <div className="mt-auto">
                 <button className="flex items-center space-x-2 p-3 rounded-lg hover:bg-blue-800 w-full" onClick={onLogout}>
-                    <FontAwesomeIcon icon={faUser} className='text-lg' />
+                    <FontAwesomeIcon icon={faSignOut} className='text-lg' />
                     <span className='font-medium'>Logout</span>
                 </button>
             </div>
