@@ -1,141 +1,279 @@
-import { useState, useMemo } from 'react'
+import React, { useState, useEffect } from 'react';
+import { Calendar as Calendario, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { Calendar as Calendario, momentLocalizer } from 'react-big-calendar'
-import moment from 'moment'
-import 'react-big-calendar/lib/css/react-big-calendar.css'
-import { startAddingNewEvent } from '../../../store/portal/calendar/calendarThunks';  // Importar thunk para añadir eventos
+import { fetchEvents, addEvent, updateEvent, deleteEvent } from '../../../store/portal/calendar/calendarThunks';
+import { addHours } from 'date-fns';
 
-// Setup the localizer for react-big-calendar
-const localizer = momentLocalizer(moment)
+const localizer = momentLocalizer(moment);
 
-export const Calendar = () => {
+export const CalendarPage = () => {
   const dispatch = useDispatch();
-  const { events } = useSelector(state => state.events);  // Obtener eventos del estado global
+  const { events, status, error } = useSelector((state) => state.events);
+  const { uid } = useSelector(state => state.auth);
 
-  const [newEvent, setNewEvent] = useState({ title: '', start: new Date(), end: new Date() })
-  const [isAddEventOpen, setIsAddEventOpen] = useState(false)  // Estado para controlar el modal
+  const initialEventState = {
+    title: '',
+    description: '',
+    location: '',
+    category: '',
+    start: new Date(),
+    end: addHours(new Date(), 1),
+    userId: uid,
+  };
+
+  const [newEvent, setNewEvent] = useState(initialEventState);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editEventId, setEditEventId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  useEffect(() => {
+    dispatch(fetchEvents());
+  }, [dispatch]);
 
   const handleAddEvent = () => {
-    // Despachar el thunk para añadir un nuevo evento a Firebase
-    dispatch(startAddingNewEvent(newEvent));
+    if (newEvent.title) {
+      dispatch(addEvent(newEvent));
+      setNewEvent(initialEventState); // Resetear el estado del evento
+      setIsModalOpen(false);
+    } else {
+      alert('Event title is required');
+    }
+  };
 
-    // Resetear el estado local y cerrar el modal
-    setNewEvent({ title: '', start: new Date(), end: new Date() });
-    setIsAddEventOpen(false);
-  }
+  const handleStartEditEvent = (event) => {
+    if (event.userId === uid) {
+      setNewEvent(event);
+      setEditEventId(event.id);
+      setIsEditing(true);
+      setIsModalOpen(true);
+    } else {
+      alert("You can only edit events you created.");
+    }
+  };
 
-  const { components, defaultDate } = useMemo(() => ({
-    components: {
-      event: ({ event }) => (
-        <span>{event.title}</span>
-      ),
-    },
-    defaultDate: new Date(),
-  }), [])
+  const handleSaveEditEvent = () => {
+    if (editEventId && newEvent.userId === uid) {
+      dispatch(updateEvent({ ...newEvent, id: editEventId }));
+      setIsEditing(false);
+      setNewEvent(initialEventState); // Resetear el estado del evento
+      setIsModalOpen(false);
+    } else {
+      alert("You can only edit events you created.");
+    }
+  };
+
+  const handleDeleteEvent = (eventId, eventUserId) => {
+    if (eventUserId === uid) {
+      dispatch(deleteEvent(eventId));
+    } else {
+      alert("You can only delete events you created.");
+    }
+  };
+
+  const handleDoubleClickEvent = (event) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
+
+  const openAddEventModal = () => {
+    setNewEvent(initialEventState); // Resetear el formulario
+    setIsEditing(false);
+    setSelectedEvent(null); // Limpiar el evento seleccionado
+    setIsModalOpen(true);
+  };
+
+  const eventPropGetter = (event) => {
+    const isUserEvent = event.userId === uid;
+    const isEventPast = moment(event.end).isBefore(moment());
+
+    return {
+      style: {
+        backgroundColor: isEventPast ? '#ffcccc' : isUserEvent ? '#0066ff' : '#999999',
+        color: 'white',
+      },
+    };
+  };
 
   return (
-    <div className="flex flex-row h-screen">
-      
-      {/* Calendario principal */}
-      <div className="flex-grow p-6">
-        <h1 className="text-3xl font-bold mb-4">Calendar</h1>
+    <div className="flex flex-col h-screen bg-gray-50">
+      <h1 className="text-center text-3xl font-bold py-4">Calendar Overview</h1>
 
-        {/* Botón flotante para abrir el modal de agregar evento */}
-        <button
-          onClick={() => setIsAddEventOpen(true)}
-          className="fixed bottom-8 right-8 bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full shadow-lg"
-          style={{ zIndex: 50 }}  // Asegura que el botón esté encima de otros elementos
-        >
-          Add Event
-        </button>
+      <div className="flex-grow p-6 flex space-x-6">
+        {/* Sección del Calendario */}
+        <div className="w-2/3 bg-white shadow-lg rounded-lg p-6">
+          <Calendario
+            localizer={localizer}
+            events={events}
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: '70vh' }}
+            onDoubleClickEvent={handleDoubleClickEvent}
+            eventPropGetter={eventPropGetter}
+          />
+        </div>
 
-        {/* Modal de agregar evento */}
-        {isAddEventOpen && (
-          <div 
-            className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center"
-            style={{ zIndex: 50 }}  // Asegura que el modal tenga un z-index alto
-          >
-            <div className="bg-white p-6 rounded shadow-lg max-w-lg w-full" style={{ zIndex: 100 }}>
-              <h2 className="text-xl font-bold mb-4">Agregar Nuevo Evento</h2>
-              <div className="mb-4">
-                <label htmlFor="title" className="block text-gray-700">Título</label>
+        {/* Listas de Eventos */}
+        <div className="w-1/3 space-y-6">
+          {/* Lista de Eventos Actuales */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold mb-3">Upcoming Events</h2>
+            <ul className="space-y-2">
+              {events.filter(event => !moment(event.end).isBefore(moment())).map((event) => (
+                <li key={event.id} className="flex items-center justify-between p-2 border rounded">
+                  <span className="flex-grow font-semibold">{event.title}</span>
+                  {event.userId === uid && (
+                    <div className="space-x-2">
+                      <button onClick={() => handleStartEditEvent(event)} className="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
+                      <button onClick={() => handleDeleteEvent(event.id, event.userId)} className="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
+                    </div>
+                  )}
+                </li>
+              ))}
+              {events.length === 0 && <li className="text-gray-500">No events added</li>}
+            </ul>
+          </div>
+
+          {/* Lista de Eventos Pasados */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold mb-3">Past Events</h2>
+            <ul className="space-y-2">
+              {events
+                .filter(event => moment(event.end).isBefore(moment()))
+                .map((event) => (
+                  <li key={event.id} className="p-2 bg-red-100 rounded">
+                    <strong>{event.title}</strong> - {moment(event.start).format('MMMM Do YYYY, h:mm A')} to {moment(event.end).format('h:mm A')}
+                  </li>
+                ))}
+              {events.filter(event => moment(event.end).isBefore(moment())).length === 0 && (
+                <li className="text-gray-500">No past events</li>
+              )}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      {/* Botón flotante para abrir el modal de agregar evento */}
+      <button
+        onClick={openAddEventModal}
+        className="fixed bottom-6 right-6 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600"
+      >
+        + Add Event
+      </button>
+
+      {/* Modal para agregar o ver detalles de evento */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full relative">
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 font-bold text-lg"
+            >
+              &times;
+            </button>
+            
+            {selectedEvent && !isEditing ? (
+              <>
+                <h2 className="text-2xl font-bold mb-3">{selectedEvent.title}</h2>
+                <p><strong>Start:</strong> {moment(selectedEvent.start).format('MMMM Do YYYY, h:mm A')}</p>
+                <p><strong>End:</strong> {moment(selectedEvent.end).format('MMMM Do YYYY, h:mm A')}</p>
+                <p><strong>Description:</strong> {selectedEvent.description || "No description"}</p>
+                <p><strong>Location:</strong> {selectedEvent.location || "No location"}</p>
+                <p><strong>Category:</strong> {selectedEvent.category || "No category"}</p>
+                {selectedEvent.userId === uid && (
+                  <div className="flex space-x-2 mt-4">
+                    <button
+                      onClick={() => handleStartEditEvent(selectedEvent)}
+                      className="bg-yellow-500 text-white p-2 rounded w-full"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => { handleDeleteEvent(selectedEvent.id, selectedEvent.userId); setIsModalOpen(false); }}
+                      className="bg-red-500 text-white p-2 rounded w-full"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-bold mb-3">{isEditing ? "Edit Event" : "Add New Event"}</h2>
                 <input
-                  id="title"
                   type="text"
+                  placeholder="Event Title"
                   value={newEvent.title}
                   onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                  className="border border-gray-300 p-2 rounded w-full mb-2"
                 />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="start" className="block text-gray-700">Inicio</label>
+                <textarea
+                  placeholder="Description"
+                  value={newEvent.description}
+                  onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
+                  className="border border-gray-300 p-2 rounded w-full mb-2"
+                />
                 <input
-                  id="start"
+                  type="text"
+                  placeholder="Location"
+                  value={newEvent.location}
+                  onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+                  className="border border-gray-300 p-2 rounded w-full mb-2"
+                />
+                <select
+                  value={newEvent.category}
+                  onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
+                  className="border border-gray-300 p-2 rounded w-full mb-4"
+                >
+                  <option value="">Select Category</option>
+                  <option value="Meeting">Meeting</option>
+                  <option value="Workshop">Workshop</option>
+                  <option value="Social">Social</option>
+                </select>
+                <input
                   type="datetime-local"
                   value={moment(newEvent.start).format('YYYY-MM-DDTHH:mm')}
-                  onChange={(e) => setNewEvent({ ...newEvent, start: new Date(e.target.value) })}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                  onChange={(e) =>
+                    setNewEvent({
+                      ...newEvent,
+                      start: new Date(e.target.value),
+                      end: addHours(new Date(e.target.value), 1),
+                    })
+                  }
+                  className="border border-gray-300 p-2 rounded w-full mb-4"
                 />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="end" className="block text-gray-700">Fin</label>
-                <input
-                  id="end"
-                  type="datetime-local"
-                  value={moment(newEvent.end).format('YYYY-MM-DDTHH:mm')}
-                  onChange={(e) => setNewEvent({ ...newEvent, end: new Date(e.target.value) })}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                />
-              </div>
-              <div className="flex justify-end">
-                <button
-                  onClick={handleAddEvent}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Agregar Evento
-                </button>
-                <button
-                  onClick={() => setIsAddEventOpen(false)}
-                  className="ml-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
+                <div className="flex space-x-2">
+                  {isEditing ? (
+                    <>
+                      <button
+                        onClick={handleSaveEditEvent}
+                        className="bg-green-500 text-white p-2 rounded w-full"
+                      >
+                        Save Changes
+                      </button>
+                      <button
+                        onClick={() => { setIsEditing(false); setIsModalOpen(false); }}
+                        className="bg-gray-500 text-white p-2 rounded w-full"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={handleAddEvent}
+                      className="bg-blue-500 text-white p-2 rounded w-full"
+                    >
+                      Add Event
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
           </div>
-        )}
-
-        {/* Calendario */}
-        <Calendario
-          localizer={localizer}
-          events={events}  // Lista de eventos desde Redux
-          startAccessor="start"
-          endAccessor="end"
-          style={{ height: 'calc(100vh - 200px)', zIndex: 1 }}  // Da un z-index menor al calendario
-          components={components}
-          defaultDate={defaultDate}
-          selectable={false}  // No permite seleccionar intervalos en el calendario
-        />
-      </div>
-      {/* Sidebar con Eventos de Hoy */}
-      <div className="w-1/4 p-4 bg-gray-100 shadow-lg">
-        <h2 className="text-2xl font-bold mb-4">Today's Events</h2>
-        <ul>
-          {events.length === 0 ? (
-            <li className="text-gray-500">No events today</li>
-          ) : (
-            events.map(event => (
-              <li key={event.id} className="mb-4">
-                <span className="block font-semibold">{event.title}</span>
-                <span className="text-gray-600">
-                  {moment(event.start).format('h:mm A')} - {moment(event.end).format('h:mm A')}
-                </span>
-              </li>
-            ))
-          )}
-        </ul>
-      </div>
-
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};

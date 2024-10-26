@@ -1,12 +1,13 @@
-// store/portal/dashboard/dashboardSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-    students: [],
-    registrations: [],
-    campaigns: [],
-    userStatus: [],
-    status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed'
+    clubComparisonData: [],        // Comparación entre clubes por año
+    totalAttendees: 0,             // Total de asistentes entre años
+    currentYearClubsByMonth: [],   // Clubes por mes del año actual
+    previousYearClubsByMonth: [],  // Clubes por mes del año anterior
+    currentYearAttendeesByMonth: [], // Asistentes por mes del año actual
+    previousYearAttendeesByMonth: [], // Asistentes por mes del año anterior
+    status: 'idle',                // 'idle' | 'loading' | 'succeeded' | 'failed'
     error: null,
 };
 
@@ -20,10 +21,12 @@ export const dashboardSlice = createSlice({
         },
         fetchDashboardDataSuccess(state, action) {
             state.status = 'succeeded';
-            state.students = action.payload.students;
-            state.registrations = action.payload.registrations;
-            state.campaigns = action.payload.campaigns;
-            state.userStatus = action.payload.userStatus;
+            state.clubComparisonData = action.payload.clubComparisonData;
+            state.totalAttendees = action.payload.totalAttendees;
+            state.currentYearClubsByMonth = action.payload.currentYearClubsByMonth;
+            state.previousYearClubsByMonth = action.payload.previousYearClubsByMonth;
+            state.currentYearAttendeesByMonth = action.payload.currentYearAttendeesByMonth;
+            state.previousYearAttendeesByMonth = action.payload.previousYearAttendeesByMonth;
             state.error = null;
         },
         fetchDashboardDataFailure(state, action) {
@@ -38,4 +41,3 @@ export const {
     fetchDashboardDataSuccess,
     fetchDashboardDataFailure
 } = dashboardSlice.actions;
-

@@ -1,21 +1,44 @@
-import {
-    addEventToFirestore,
-    getEventsFromFirestore,
-    updateEventInFirestore,
-    deleteEventFromFirestore
-} from '../../../firebase/providers';
-import { setEvents, addNewEvent, updateEvent, deleteEvent, setLoading, setError } from '../../portal/calendar/calendarSlice';
+// src/store/portal/events/eventsThunks.js
+import { addEventToFirestore, getEventsFromFirestore, updateEventInFirestore, deleteEventFromFirestore } from '../../..//firebase/provs/eventProviders';
+import { eventsLoading, eventsReceived, eventsFailed, eventAdded, eventUpdated, eventDeleted } from '../calendar/calendarSlice';
 
-export const startAddingNewEvent = (eventData) => {
-    return async (dispatch) => {
-        dispatch(setLoading());
-        
-        const { ok, event, errorMessage } = await addEventToFirestore(eventData);
+// Thunk para cargar eventos
+export const fetchEvents = () => async (dispatch) => {
+  dispatch(eventsLoading());
+  const { ok, events, errorMessage } = await getEventsFromFirestore();
+  if (ok) {
+    dispatch(eventsReceived(events));
+  } else {
+    dispatch(eventsFailed(errorMessage));
+  }
+};
 
-        if (ok) {
-            dispatch(addNewEvent(event));  // Actualizar el estado en Redux con el nuevo evento
-        } else {
-            dispatch(setError(errorMessage));  // Manejar errores
-        }
-    };
+// Thunk para añadir un evento
+export const addEvent = (eventData) => async (dispatch) => {
+  const { ok, event, errorMessage } = await addEventToFirestore(eventData);
+  if (ok) {
+    dispatch(eventAdded(event));
+  } else {
+    dispatch(eventsFailed(errorMessage));
+  }
+};
+
+// Thunk para actualizar un evento
+export const updateEvent = (eventData) => async (dispatch) => {
+  const { ok, errorMessage } = await updateEventInFirestore(eventData);
+  if (ok) {
+    dispatch(eventUpdated(eventData));
+  } else {
+    dispatch(eventsFailed(errorMessage));
+  }
+};
+
+// Thunk para eliminar un evento
+export const deleteEvent = (eventId) => async (dispatch) => {
+  const { ok, errorMessage } = await deleteEventFromFirestore(eventId);
+  if (ok) {
+    dispatch(eventDeleted(eventId));
+  } else {
+    dispatch(eventsFailed(errorMessage));
+  }
 };

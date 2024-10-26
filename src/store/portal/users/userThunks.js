@@ -1,6 +1,14 @@
 // store/portal/users/usersThunks.js
 import { sendPasswordResetEmail } from "firebase/auth";
-import { addUserToFirestore, deleteUserFromFirestore, getUsersFromFirestore, registerUserWithEmailPassword, updateUserInFirestore } from "../../../firebase/providers";
+import { 
+    addUserToFirestore, 
+    deleteUserFromFirestore, 
+    getUsersFromFirestore,  
+    updateUserInFirestore 
+} from "../../../firebase/provs/userProviders";
+
+import {registerUserWithEmailPassword} from "../../../firebase/provs/authProviders"
+
 import {
     fetchUsersStart,
     fetchUsersSuccess,
@@ -33,13 +41,16 @@ export const startAddUser = (user) => {
             const { ok, uid, errorMessage } = await registerUserWithEmailPassword({
                 email: user.email,
                 password,
-                displayName: `${user.firstName} ${user.lastName}`,
             });
 
             if (!ok) throw new Error(errorMessage);
 
-            // Agrega el usuario a Firestore (sin la contraseña)
-            const userWithoutPassword = { ...user, uid };
+            // Agrega el usuario a Firestore usando el `uid` como el ID del documento
+            const userWithoutPassword = { 
+                ...user, 
+                uid, 
+                photoUrl: "https://firebasestorage.googleapis.com/v0/b/employee-portal-8f758.appspot.com/o/profile-pictures%2Fgeneric-profile.jpg?alt=media&token=1b5dc905-b829-4379-9f0a-56b34f72e628" 
+            };
             const result = await addUserToFirestore(userWithoutPassword);
 
             if (!result.ok) throw new Error(result.errorMessage);
@@ -47,7 +58,7 @@ export const startAddUser = (user) => {
             // Envía el correo de restablecimiento de contraseña
             await sendPasswordResetEmail(FirebaseAuth, user.email);
 
-            dispatch(addUserSuccess({ id: result.uid, ...userWithoutPassword }));
+            dispatch(addUserSuccess({ id: uid, ...userWithoutPassword }));  // Aquí usamos el uid del auth
         } catch (error) {
             console.error("Error adding user:", error.message);
             dispatch(addUserFailure(error.message));

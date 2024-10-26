@@ -1,30 +1,49 @@
+// src/store/portal/events/eventsSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
-export const eventSlice = createSlice({
-    name: 'events',
-    initialState: {
-        events: [],
-        isLoading: false,
-        errorMessage: null
+const initialState = {
+  events: [],
+  status: 'idle', // 'loading', 'succeeded', 'failed'
+  error: null,
+};
+
+const eventSlice = createSlice({
+  name: 'events',
+  initialState,
+  reducers: {
+    eventsLoading(state) {
+      state.status = 'loading';
     },
-    reducers: {
-        setEvents: (state, { payload }) => {
-            state.events = payload;
-            state.isLoading = false;
-        },
-        addNewEvent: (state, { payload }) => {
-            state.events.push(payload);
-            state.isLoading = false;
-        },
-        setLoading: (state) => {
-            state.isLoading = true;
-        },
-        setError: (state, { payload }) => {
-            state.errorMessage = payload;
-            state.isLoading = false;
-        }
-    }
+    eventsReceived(state, action) {
+      state.status = 'succeeded';
+      state.events = action.payload;
+    },
+    eventsFailed(state, action) {
+      state.status = 'failed';
+      state.error = action.payload;
+    },
+    eventAdded(state, action) {
+      state.events.push(action.payload);
+    },
+    eventUpdated(state, action) {
+      const index = state.events.findIndex(event => event.id === action.payload.id);
+      if (index !== -1) {
+        state.events[index] = action.payload;
+      }
+    },
+    eventDeleted(state, action) {
+      state.events = state.events.filter(event => event.id !== action.payload);
+    },
+  },
 });
 
-export const { setEvents, addNewEvent, setLoading, setError } = eventSlice.actions;
+export const {
+  eventsLoading,
+  eventsReceived,
+  eventsFailed,
+  eventAdded,
+  eventUpdated,
+  eventDeleted,
+} = eventSlice.actions;
+
 export default eventSlice;

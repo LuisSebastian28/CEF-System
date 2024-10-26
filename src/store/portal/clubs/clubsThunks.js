@@ -1,6 +1,22 @@
 // store/portal/clubs/clubsThunks.js
 
-import { getClubsFromFirestore, getAttendeesForClub, getUserFromReference, addClubToFirestore, deleteClubFromFirestore, updateClubInFirestore, editAttendeeInFirestore, deleteAttendeeFromFirestore, addAttendeeToFirestore } from "../../../firebase/providers";
+import { 
+  getAttendeesForClub, 
+  editAttendeeInFirestore, 
+  deleteAttendeeFromFirestore, 
+  addAttendeeToFirestore } from "../../../firebase/provs/attendeeProviders";
+
+import {
+  addClubToFirestore, 
+  deleteClubFromFirestore, 
+  updateClubInFirestore, 
+  getClubsFromFirestore, 
+} from "../../../firebase/provs/clubProviders"
+
+import {
+  getUserFromReference, 
+} from "../../../firebase/provs/userProviders"
+
 import {
   fetchClubsStart,
   fetchClubsSuccess,
