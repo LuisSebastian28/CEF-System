@@ -1,37 +1,49 @@
-// src/portal/components/ClubCard.js
+// ClubCard.jsx
+
 import React from 'react';
+import { useDispatch } from 'react-redux';
+import { startDeleteClub } from '../../../store/portal/clubs/clubsThunks';
 
-export const ClubCard = ({ club, onExpand, onEdit, onDelete, onInfo, isExpanded }) => {
-    const { id, eventType, date, totalAttendees } = club;
-    const eventTypeLabels = {
-        goodnewsdaycamp: 'Good News Day Camp',
-        fivedayclub: '5-Day Club',
-        teachertrainingclass: 'Teacher Training Class',
-        goodnewsclub: 'Good News Club',
-        releasedtimes: 'Released Times',
-    };
+const eventTypeMapping = {
+  fivedayclub: '5-Day Club',
+  goodnewsdaycamp: 'Good News Camp',
+  teachertrainingclass: 'Teacher Training Classes',
+  goodnewsclub: 'Good News Club',
+  releasedtimes: 'Released Times',
+};
 
-    return (
-        <div className="bg-white shadow-md p-4 rounded-lg flex justify-between items-center space-x-4">
-            <div>
-                <span className="text-lg font-semibold">{eventTypeLabels[eventType]}</span>
-                <p className="text-sm text-gray-600">{date}</p>
-                <p className="text-sm text-gray-600">{totalAttendees} asistentes</p>
-            </div>
-            <div className="flex items-center space-x-2">
-                <button className="bg-gray-200 p-2 rounded-md hover:bg-gray-300" onClick={onInfo}>
-                    <i className="fas fa-info text-gray-600"></i>
-                </button>
-                <button className="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600" onClick={onEdit}>
-                    <i className="fas fa-cog"></i>
-                </button>
-                <button className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600" onClick={() => onDelete(id)}>
-                    <i className="fas fa-trash"></i>
-                </button>
-                <button className="bg-gray-300 p-2 rounded-md hover:bg-gray-400" onClick={() => onExpand(id)}>
-                    <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'}`}></i>
-                </button>
-            </div>
-        </div>
-    );
+export const ClubCard = ({ club, onViewDetails, onEditClub, onManageAttendees }) => {
+  const dispatch = useDispatch();
+
+  const handleDeleteClub = () => {
+    if (window.confirm("Are you sure you want to delete this club?")) {
+      dispatch(startDeleteClub(club.id));
+    }
+  };
+
+  return (
+    <div className="border p-4 rounded-lg shadow-md bg-white flex justify-between items-center">
+      <div>
+        <h3 className="text-xl font-semibold mb-1">
+          {eventTypeMapping[club.eventType] || club.eventType}
+        </h3>
+        <p className="text-gray-600"><strong>Date:</strong> {club.date}</p>
+        <p className="text-gray-600"><strong>Time:</strong> {club.time}</p>
+      </div>
+      <div className="flex gap-2">
+        <button className="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600" onClick={() => onViewDetails(club)}>
+          <i className="fas fa-eye"></i>
+        </button>
+        <button className="px-3 py-1 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600" onClick={() => onEditClub(club)}>
+          <i className="fas fa-edit"></i>
+        </button>
+        <button className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600" onClick={() => onManageAttendees(club)}>
+          <i className="fas fa-users"></i>
+        </button>
+        <button className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600" onClick={handleDeleteClub}>
+          <i className="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  );
 };

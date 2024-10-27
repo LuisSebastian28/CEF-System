@@ -1,67 +1,123 @@
-import React, { useEffect, useState } from 'react';
+// Insights.jsx
+
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { startDeleteClub, startFetchClubs } from '../../../store/portal/clubs/clubsThunks';
-import { FilterButtons } from '../components/FilterButtons';
-import { Pagination } from '../components/Pagination';
+import { startFetchClubs } from '../../../store/portal/clubs/clubsThunks';
 import { ClubCard } from '../components/ClubCard';
-import { ExpandedAttendeesList } from '../components/ExpandedAttendess';
-import { AttendeesModal } from '../components/AttendessModal';
-import { EditClubModal } from '../components/EditClubModal';
+import { ClubDetailsModal } from '../components/ClubDetailsModal';
+import { ClubEditModal } from '../components/ClubEditModal';
+import { AttendeesModal } from '../components/AttendeesModal';
+import { ClubFilter } from '../components/ClubFilter';
+
+const ITEMS_PER_PAGE = 6;
 
 export const Insights = () => {
-    const dispatch = useDispatch();
-    const { clubs, status, error } = useSelector((state) => state.clubs);
+  const dispatch = useDispatch();
+  const { clubs, status } = useSelector((state) => state.clubs);
+  const [selectedType, setSelectedType] = useState("all");
+  const [selectedClub, setSelectedClub] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAttendeesModalOpen, setIsAttendeesModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [expandedClubs, setExpandedClubs] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [filter, setFilter] = useState('All');
-    const itemsPerPage = 10;
+  useEffect(() => {
+    dispatch(startFetchClubs());
+  }, [dispatch]);
 
-    useEffect(() => {
-        if (status === 'idle') {
-            dispatch(startFetchClubs());
-        }
-    }, [status, dispatch]);
+  const handleFilterChange = (type) => { 
+    setSelectedType(type); 
+    setCurrentPage(1); // Reiniciar a la primera página cuando se cambia el filtro
+  };
+  
+  const handleViewDetails = (club) => { setSelectedClub(club); setIsModalOpen(true); };
+  const handleEditClub = (club) => { setSelectedClub(club); setIsEditModalOpen(true); };
+  const handleManageAttendees = (club) => { setSelectedClub(club); setIsAttendeesModalOpen(true); };
 
-    const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+  const closeDetailsModal = () => { setIsModalOpen(false); setSelectedClub(null); };
+  const closeEditModal = () => { setIsEditModalOpen(false); setSelectedClub(null); };
+  const closeAttendeesModal = () => { setIsAttendeesModalOpen(false); setSelectedClub(null); };
 
-    const filteredClubs = clubs.filter(club => filter === 'All' || club.eventType === filter);
-    const currentInsights = filteredClubs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-    const totalPages = Math.ceil(filteredClubs.length / itemsPerPage);
+  // Filtrar y paginar los clubes
+  const filteredClubs = selectedType === "all" ? clubs : clubs.filter((club) => club.eventType === selectedType);
+  const totalPages = Math.ceil(filteredClubs.length / ITEMS_PER_PAGE);
+  const paginatedClubs = filteredClubs.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-    const handleExpand = (clubId) => {
-        setExpandedClubs(prev => prev.includes(clubId) ? prev.filter(id => id !== clubId) : [...prev, clubId]);
-    };
+  // Funciones de paginación
+  const goToNextPage = () => { if (currentPage < totalPages) setCurrentPage((prev) => prev + 1); };
+  const goToPreviousPage = () => { if (currentPage > 1) setCurrentPage((prev) => prev - 1); };
 
-    return (
-        <div className="p-8 white min-h-screen">
-            <h2 className="text-3xl font-bold mb-4">Insights</h2>
-            <FilterButtons filter={filter} setFilter={setFilter} setCurrentPage={setCurrentPage} />
-            {status === 'loading' && <p>Cargando clubes...</p>}
-            {status === 'failed' && <p className="text-red-500">Error: {error}</p>}
-
-            {status === 'succeeded' && (
-                <div className="space-y-4">
-                    {currentInsights.map((club) => (
-                        <div key={club.id}>
-                            <ClubCard
-                                club={club}
-                                onExpand={handleExpand}
-                                onDelete={(id) => dispatch(startDeleteClub(id))}
-                                onEdit={() => setIsEditModalOpen(true)}
-                                onInfo={() => setIsModalOpen(true)}
-                                isExpanded={expandedClubs.includes(club.id)}
-                            />
-                            {expandedClubs.includes(club.id) && <ExpandedAttendeesList attendees={club.attendees} />}
-                        </div>
-                    ))}
-                </div>
-            )}
-            <Pagination totalPages={totalPages} currentPage={currentPage} handlePageChange={handlePageChange} />
-            <AttendeesModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-            <EditClubModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
+  return (
+    <div className="container mx-auto p-4 flex flex-col md:flex-row">
+      <div className="w-full md:w-3/4">
+        <h1 className="text-3xl font-bold mb-4">Insights</h1>
+        
+        {/* Guía de colores para los botones */}
+        <div className="flex items-center space-x-4 mb-6">
+          <div className="flex items-center space-x-2">
+            <span className="w-4 h-4 bg-blue-500 rounded-full"></span>
+            <span className="text-gray-600">Details</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <span className="w-4 h-4 bg-yellow-500 rounded-full"></span>
+            <span className="text-gray-600">Edit</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <span className="w-4 h-4 bg-green-500 rounded-full"></span>
+            <span className="text-gray-600">Attendance</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <span className="w-4 h-4 bg-red-500 rounded-full"></span>
+            <span className="text-gray-600">Delete</span>
+          </div>
         </div>
-    );
+
+        {/* Contenedor desplazable para las tarjetas */}
+        <div className="space-y-4 overflow-y-auto max-h-[70vh] pr-2">
+          {status === 'loading' ? (
+            <p>Loading clubs...</p>
+          ) : (
+            paginatedClubs.map((club) => (
+              <ClubCard 
+                key={club.id} 
+                club={club} 
+                onViewDetails={handleViewDetails} 
+                onEditClub={handleEditClub} 
+                onManageAttendees={handleManageAttendees}
+              />
+            ))
+          )}
+        </div>
+
+        {/* Controles de paginación */}
+        <div className="flex justify-center items-center space-x-4 mt-6">
+          <button 
+            className={`px-3 py-1 rounded-lg ${currentPage === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"}`} 
+            onClick={goToPreviousPage}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span className="text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button 
+            className={`px-3 py-1 rounded-lg ${currentPage === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white hover:bg-blue-600"}`} 
+            onClick={goToNextPage}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      <div className="w-full md:w-1/4 mt-12 md:mt-0 md:ml-6">
+        <ClubFilter selectedType={selectedType} onFilterChange={handleFilterChange} />
+      </div>
+
+      <ClubDetailsModal club={selectedClub} isOpen={isModalOpen} onClose={closeDetailsModal} />
+      <ClubEditModal club={selectedClub} isOpen={isEditModalOpen} onClose={closeEditModal} />
+      <AttendeesModal club={selectedClub} isOpen={isAttendeesModalOpen} onClose={closeAttendeesModal} />
+    </div>
+  );
 };

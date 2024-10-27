@@ -5,6 +5,7 @@ import { clubsSlice } from "./portal/clubs/clubsSlice";
 import { dashboardSlice } from "./portal/dashboard/dashboardSlice";
 import resourcesSlice from "./portal/resourcesCef/resourcesSlice";
 import eventSlice from "./portal/calendar/calendarSlice";
+import { attendeesSlice } from "./portal/attendees/attendeesSlice";
 // import { eventSlice } from "./portal/forms/formsSlice";
 
 export const store = configureStore({
@@ -15,6 +16,7 @@ export const store = configureStore({
         clubs: clubsSlice.reducer,
         dashboard: dashboardSlice.reducer,
         events: eventSlice.reducer,
-        resources: resourcesSlice.reducer
+        resources: resourcesSlice.reducer,
+        attendees: attendeesSlice.reducer
     }
 })
