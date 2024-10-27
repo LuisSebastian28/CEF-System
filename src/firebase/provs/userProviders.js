@@ -19,7 +19,6 @@ export const getUserFromFirestore = async (uid) => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-        console.log(docSnap)
         return docSnap.data();
     } else {
         console.log("No such document!");

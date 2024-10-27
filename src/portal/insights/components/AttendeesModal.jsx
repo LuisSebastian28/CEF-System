@@ -17,8 +17,9 @@ export const AttendeesModal = ({ club, isOpen, onClose }) => {
             dispatch(startFetchAttendees(club.id));
             setIsAdding(false);
             setIsEditing(false);
+            setFormValues(config?.initialValues || {});
         }
-    }, [dispatch, isOpen, club]);
+    }, [dispatch, isOpen, club, config]);
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -48,7 +49,10 @@ export const AttendeesModal = ({ club, isOpen, onClose }) => {
     const startEdit = (attendee) => {
         setIsEditing(true);
         setCurrentAttendeeId(attendee.id);
-        setFormValues(attendee);
+        setFormValues({
+            ...config.initialValues,
+            ...attendee,
+        });
     };
 
     const handleDelete = async (attendeeId) => {
@@ -69,6 +73,7 @@ export const AttendeesModal = ({ club, isOpen, onClose }) => {
     };
 
     const personalInfoFields = config?.fields.filter((field) => !config.attendanceDays?.includes(field));
+    const tshirtSizes = ['XS', 'S', 'M', 'L', 'XL'];
 
     if (!isOpen || !club) return null;
 
@@ -97,9 +102,11 @@ export const AttendeesModal = ({ club, isOpen, onClose }) => {
                             {attendees.map((attendee) => (
                                 <li key={attendee.id} className="py-4 px-6 bg-gray-100 rounded-lg shadow flex justify-between items-center">
                                     <div>
-                                        <p className="text-lg font-medium"><strong>Name:</strong> {attendee.name || "N/A"}</p>
-                                        <p><strong>Age:</strong> {attendee.age || "N/A"}</p>
-                                        <p><strong>Contact:</strong> {attendee.contact || "N/A"}</p>
+                                        <p className="text-lg font-medium"><strong>Name:</strong> {attendee.name || attendee.firstName || "N/A"}</p>
+                                        {club.eventType !== 'teachertrainingclass' && (
+                                            <p><strong>Date:</strong> {attendee.date || "N/A"}</p>
+                                        )}
+                                        <p><strong>Address:</strong> {attendee.address || "N/A"}</p>
                                     </div>
                                     <div className="flex space-x-2">
                                         <button
@@ -162,13 +169,26 @@ export const AttendeesModal = ({ club, isOpen, onClose }) => {
                                     {personalInfoFields.map((field) => (
                                         <div key={field} className="flex flex-col mb-4">
                                             <label className="font-semibold text-gray-700 capitalize mb-2">{field}:</label>
-                                            <input
-                                                type={field === 'date' ? 'date' : typeof config.initialValues[field] === 'boolean' ? 'checkbox' : 'text'}
-                                                name={field}
-                                                value={formValues[field] || ''}
-                                                onChange={handleInputChange}
-                                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                                            />
+                                            {field === 'child_tshirt_size' ? (
+                                                <select
+                                                    name={field}
+                                                    value={formValues[field] || ''}
+                                                    onChange={handleInputChange}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                                                >
+                                                    {tshirtSizes.map((size) => (
+                                                        <option key={size} value={size}>{size}</option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <input
+                                                    type={field === 'child_birthday' || (field === 'date' && club.eventType !== 'teachertrainingclass') ? 'date' : typeof config.initialValues[field] === 'boolean' ? 'checkbox' : 'text'}
+                                                    name={field}
+                                                    value={formValues[field] || ''}
+                                                    onChange={handleInputChange}
+                                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                                                />
+                                            )}
                                         </div>
                                     ))}
                                 </div>

@@ -1,4 +1,3 @@
-// authProviders.js
 import { GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth";
 import { FirebaseAuth, FirebaseDB } from '../firebaseConfig';
 import { doc, getDoc } from "firebase/firestore";

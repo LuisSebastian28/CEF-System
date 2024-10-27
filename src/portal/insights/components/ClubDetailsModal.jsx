@@ -3,7 +3,6 @@ import { formFields } from '../../../portal/forms/helpers/formConfigs';
 import { getUserFromReference } from '../../../firebase/provs/userProviders';
 
 export const ClubDetailsModal = ({ club, isOpen, onClose }) => {
-  console.log(club)
   const [missionaryData, setMissionaryData] = useState(null);
 
   const eventTypeMapping = {

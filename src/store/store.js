@@ -6,17 +6,17 @@ import { dashboardSlice } from "./portal/dashboard/dashboardSlice";
 import resourcesSlice from "./portal/resourcesCef/resourcesSlice";
 import eventSlice from "./portal/calendar/calendarSlice";
 import { attendeesSlice } from "./portal/attendees/attendeesSlice";
-// import { eventSlice } from "./portal/forms/formsSlice";
 
 export const store = configureStore({
     reducer: {
         auth: authSlice.reducer,
         users: usersSlice.reducer,
-        // events: eventSlice.reducer,
         clubs: clubsSlice.reducer,
         dashboard: dashboardSlice.reducer,
         events: eventSlice.reducer,
         resources: resourcesSlice.reducer,
-        attendees: attendeesSlice.reducer
-    }
-})
+        attendees: attendeesSlice.reducer,
+    },
+    devTools: process.env.NODE_ENV !== 'production',
+});
+
