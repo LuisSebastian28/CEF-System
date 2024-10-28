@@ -6,10 +6,16 @@ import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { UserList } from '../components/UserList';
 import { UserFormModal } from '../components/UserFormModal';
 import { FloatingButton } from '../components/FloatingButton';
+import { Navigate } from 'react-router-dom';
+
 
 export const Users = () => {
     const dispatch = useDispatch();
     const { users, status, error } = useSelector((state) => state.users);
+    const { roleDesc } = useSelector(state => state.auth); 
+
+    const allowedRoles = ['IT Department', 'Director', 'Assistant-Director'];
+    const hasAccess = allowedRoles.includes(roleDesc); 
 
     const [open, setOpen] = useState(false);
     const [newUser, setNewUser] = useState({
@@ -68,6 +74,11 @@ export const Users = () => {
     useEffect(() => {
         dispatch(startFetchUsers());
     }, [dispatch]);
+
+    // Si el usuario no tiene acceso, se redirige
+    if (!hasAccess) {
+        return <Navigate to="/dashboard" />;
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 relative">

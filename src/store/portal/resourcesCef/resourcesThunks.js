@@ -1,5 +1,10 @@
 // store/portal/resources/resourcesThunks.js
-import { fetchResourcesStart, fetchResourcesSuccess, fetchResourcesFailure } from './resourcesSlice';
+import { FirebaseStorage } from '../../../firebase/firebaseConfig';
+import { ref, listAll, getDownloadURL, uploadBytesResumable, deleteObject } from "firebase/storage";
+import { 
+  fetchResourcesStart, fetchResourcesSuccess, fetchFirebaseResourcesSuccess, 
+  fetchResourcesFailure, uploadProgress, addResource, deleteResource 
+} from './resourcesSlice';
 
 export const fetchResources = () => async (dispatch) => {
   const folderId = '1Lqzal8iYTtyeHiV97vXzBGBTBV51aguc';
@@ -11,13 +16,67 @@ export const fetchResources = () => async (dispatch) => {
   try {
     const response = await fetch(url);
     const data = await response.json();
-
-    if (data.files) {
-      dispatch(fetchResourcesSuccess(data.files));
-    } else {
-      dispatch(fetchResourcesSuccess([])); // No hay archivos
-    }
+    dispatch(fetchResourcesSuccess(data.files || []));
   } catch (error) {
-    dispatch(fetchResourcesFailure('Failed to fetch files'));
+    dispatch(fetchResourcesFailure('Failed to fetch files from Google Drive'));
+  }
+};
+
+export const fetchFirebaseStorageResources = () => async (dispatch) => {
+  dispatch(fetchResourcesStart());
+  
+  const storageRef = ref(FirebaseStorage, 'resources');
+
+  try {
+    const result = await listAll(storageRef);
+    const files = await Promise.all(
+      result.items.map(async (itemRef) => {
+        const url = await getDownloadURL(itemRef);
+        return {
+          name: itemRef.name,
+          url,
+          mimeType: itemRef.contentType || '',
+        };
+      })
+    );
+    dispatch(fetchFirebaseResourcesSuccess(files));
+  } catch (error) {
+    dispatch(fetchResourcesFailure('Failed to fetch files from Firebase Storage'));
+  }
+};
+
+export const uploadResource = (file) => async (dispatch) => {
+  const storageRef = ref(FirebaseStorage, `resources/${file.name}`);
+  const uploadTask = uploadBytesResumable(storageRef, file);
+
+  uploadTask.on(
+    'state_changed',
+    (snapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      dispatch(uploadProgress(progress));
+    },
+    (error) => {
+      dispatch(fetchResourcesFailure('Failed to upload file'));
+    },
+    async () => {
+      const url = await getDownloadURL(uploadTask.snapshot.ref);
+      const uploadedFile = {
+        name: file.name,
+        url,
+        mimeType: file.type,
+      };
+      dispatch(addResource(uploadedFile));
+    }
+  );
+};
+
+export const deleteFirebaseResource = (fileName) => async (dispatch) => {
+  const storageRef = ref(FirebaseStorage, `resources/${fileName}`);
+  
+  try {
+    await deleteObject(storageRef);
+    dispatch(deleteResource(fileName));
+  } catch (error) {
+    dispatch(fetchResourcesFailure('Failed to delete file from Firebase Storage'));
   }
 };

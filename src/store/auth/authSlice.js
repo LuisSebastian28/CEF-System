@@ -9,6 +9,7 @@ export const authSlice = createSlice({
         firstName: null,
         lastName: null,
         photoURL: null,
+        roleDesc: null,
         errorMessage: null,
     },
     reducers: {
@@ -19,6 +20,7 @@ export const authSlice = createSlice({
             state.firstName = payload.firstName
             state.lastName = payload.lastName
             state.photoURL = payload.photoURL
+            state.roleDesc = payload.roleDesc
             state.errorMessage = null
         },
         logout: (state, { payload }) => {
@@ -28,6 +30,7 @@ export const authSlice = createSlice({
             state.firstName = null
             state.lastName = null
             state.photoURL = null
+            state.roleDesc = null
             state.errorMessage = payload?.errorMessage
         },
         checkingCredentials: (state) => {

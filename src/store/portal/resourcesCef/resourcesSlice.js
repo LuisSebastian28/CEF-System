@@ -2,9 +2,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  files: [],
+  driveFiles: [],
+  firebaseFiles: [],
   loading: false,
   error: null,
+  uploadProgress: 0,  // Progreso de carga
 };
 
 const resourcesSlice = createSlice({
@@ -16,8 +18,22 @@ const resourcesSlice = createSlice({
       state.error = null;
     },
     fetchResourcesSuccess(state, action) {
-      state.files = action.payload;
+      state.driveFiles = action.payload;
       state.loading = false;
+    },
+    fetchFirebaseResourcesSuccess(state, action) {
+      state.firebaseFiles = action.payload;
+      state.loading = false;
+    },
+    uploadProgress(state, action) {
+      state.uploadProgress = action.payload;
+    },
+    addResource(state, action) {
+      state.firebaseFiles.push(action.payload);
+      state.uploadProgress = 0;
+    },
+    deleteResource(state, action) {
+      state.firebaseFiles = state.firebaseFiles.filter((file) => file.name !== action.payload);
     },
     fetchResourcesFailure(state, action) {
       state.loading = false;
@@ -29,7 +45,11 @@ const resourcesSlice = createSlice({
 export const {
   fetchResourcesStart,
   fetchResourcesSuccess,
+  fetchFirebaseResourcesSuccess,
   fetchResourcesFailure,
+  uploadProgress,
+  addResource,
+  deleteResource,
 } = resourcesSlice.actions;
 
 export default resourcesSlice;

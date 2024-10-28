@@ -22,7 +22,8 @@ export const CEFApp = () => {
           email,
           firstName: userDoc?.firstName || '',
           lastName: userDoc?.lastName || '',
-          photoURL: userDoc?.photoUrl || ''
+          photoURL: userDoc?.photoUrl || '',
+          roleDesc: userDoc?.roleDesc || '',
         }));
       } else {
         // Si no está autenticado, disparamos el logout

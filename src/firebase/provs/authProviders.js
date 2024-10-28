@@ -12,12 +12,13 @@ export const loginWithEmailPassword = async ({ email, password }) => {
         // Buscar el usuario en la colección `users` de Firestore usando su `uid`
         const userDoc = await getDoc(doc(FirebaseDB, 'users', uid));
         if (userDoc.exists()) {
-            const { firstName, lastName, photoUrl } = userDoc.data();  // Extraer `firstName` y `lastName` de Firestore
+            const { firstName, lastName, photoUrl, roleDesc } = userDoc.data();  // Extraer `firstName` y `lastName` de Firestore
 
             return {
                 ok: true,
                 uid,
                 photoURL:photoUrl,
+                roleDesc,
                 firstName,      // Devolver el `firstName` desde Firestore
                 lastName,       // También puedes devolver el `lastName` si lo necesitas
             };
