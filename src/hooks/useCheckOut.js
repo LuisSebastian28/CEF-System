@@ -18,7 +18,7 @@ export const useCheckOut = () => {
                 return;
             }
 
-            const { uid, email, displayName = '', photoURL = '' } = user; // Valores por defecto
+            const { uid, email, firstName = '', photoURL = '', lastName = '', roleDesc = '' } = user; // Valores por defecto
 
             try {
                 const docRef = doc(FirebaseDB, 'users', uid);
@@ -29,8 +29,10 @@ export const useCheckOut = () => {
                     dispatch(login({
                         uid,
                         email,
-                        displayName: displayName || userData.displayName || '',
-                        photoURL: photoURL || userData.photoURL || '',
+                        firstName: firstName || userData.firstName || '',
+                        photoURL: photoURL || userData.photoUrl || '',
+                        lastName: lastName || userData.lastName || '',
+                        roleDesc: roleDesc || userData.roleDesc || '',
                     }));
                 } else {
                     console.warn('No user document found');

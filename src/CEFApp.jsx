@@ -5,39 +5,17 @@ import { FirebaseAuth } from './firebase/firebaseConfig';  // Asegúrate de impo
 import { login, logout } from './store/auth/authSlice';  // Importa tus acciones de autenticación
 import { getUserFromFirestore } from './firebase/provs/userProviders';  // Función para obtener más datos del usuario
 import { CefRouter } from './routes/CefRouter';
+import { useCheckOut } from './hooks/useCheckOut';
+
 
 export const CEFApp = () => {
-  const dispatch = useDispatch();
+  const { isLoading } = useCheckOut();  // Usa el hook para verificar la autenticación
 
-  useEffect(() => {
-    // Verifica si el usuario ya está autenticado cuando la aplicación se monta
-    const unsubscribe = onAuthStateChanged(FirebaseAuth, async (user) => {
-      if (user) {
-        // Si el usuario está autenticado, obtenemos su información adicional de Firestore
-        const { uid, email } = user;
-        const userDoc = await getUserFromFirestore(uid);  // Obtener más datos si tienes una colección de 'users'
+  if (isLoading) {
+    return <div>Loading...</div>;  // Muestra un indicador de carga mientras verifica la autenticación
+  }
 
-        dispatch(login({
-          uid,
-          email,
-          firstName: userDoc?.firstName || '',
-          lastName: userDoc?.lastName || '',
-          photoURL: userDoc?.photoUrl || '',
-          roleDesc: userDoc?.roleDesc || '',
-        }));
-      } else {
-        // Si no está autenticado, disparamos el logout
-        dispatch(logout());
-      }
-    });
-
-    // Limpia la suscripción cuando el componente se desmonta
-    return () => unsubscribe();
-  }, [dispatch]);
-
-  return (
-    <CefRouter />
-  );
+  return <CefRouter />;
 };
 
 export default CEFApp;

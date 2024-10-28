@@ -10,7 +10,7 @@ export const ClubForm = ({ eventType }) => {
   const { users, status: usersStatus } = useSelector((state) => state.users);
   const config = formFields[eventType];
   
-  const [isSubmitted, setIsSubmitted] = useState(false);  // Nuevo estado
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const {
     formState,
@@ -28,12 +28,12 @@ export const ClubForm = ({ eventType }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsSubmitted(true);  // Cambiar el estado de enviado
+    setIsSubmitted(true);
 
     if (isFormValid) {
       dispatch(startCreateClub(formState));
       onResetForm();
-      setIsSubmitted(false);  // Reinicia el estado de enviado
+      setIsSubmitted(false);
     }
   };
 

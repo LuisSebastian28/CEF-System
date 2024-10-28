@@ -1,81 +1,28 @@
-// portal/pages/Users.jsx
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { startFetchUsers, startAddUser, startUpdateUser, startDeleteUser } from '../../../store/portal/users/userThunks';
+import React from 'react';
 import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { UserList } from '../components/UserList';
 import { UserFormModal } from '../components/UserFormModal';
 import { FloatingButton } from '../components/FloatingButton';
 import { Navigate } from 'react-router-dom';
-
+import { useUsers } from '../hooks/useUsers';
 
 export const Users = () => {
-    const dispatch = useDispatch();
-    const { users, status, error } = useSelector((state) => state.users);
-    const { roleDesc } = useSelector(state => state.auth); 
+    const {
+        users,
+        status,
+        error,
+        hasAccess,
+        open,
+        newUser,
+        setNewUser,
+        isEditing,
+        onOpenModal,
+        onCloseModal,
+        handleSubmit,
+        handleEdit,
+        handleDelete
+    } = useUsers();
 
-    const allowedRoles = ['IT Department', 'Director', 'Assistant-Director'];
-    const hasAccess = allowedRoles.includes(roleDesc); 
-
-    const [open, setOpen] = useState(false);
-    const [newUser, setNewUser] = useState({
-        county: '',
-        email: '',
-        firstName: '',
-        lastName: '',
-        role: '',
-        roleDesc: ''
-    });
-    const [editingUserId, setEditingUserId] = useState(null);
-
-    const onOpenModal = () => setOpen(true);
-    const onCloseModal = () => {
-        setOpen(false);
-        setNewUser({
-            county: '',
-            email: '',
-            firstName: '',
-            lastName: '',
-            role: '',
-            roleDesc: ''
-        });
-        setEditingUserId(null);
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (editingUserId) {
-            dispatch(startUpdateUser(editingUserId, newUser));
-        } else {
-            dispatch(startAddUser(newUser));
-        }
-        onCloseModal();
-    };
-
-    const handleEdit = (user) => {
-        setNewUser({
-            county: user.county,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            role: user.role,
-            roleDesc: user.roleDesc
-        });
-        setEditingUserId(user.id);
-        onOpenModal();
-    };
-
-    const handleDelete = (userId) => {
-        if (window.confirm("Are you sure you want to delete this user?")) {
-            dispatch(startDeleteUser(userId));
-        }
-    };
-
-    useEffect(() => {
-        dispatch(startFetchUsers());
-    }, [dispatch]);
-
-    // Si el usuario no tiene acceso, se redirige
     if (!hasAccess) {
         return <Navigate to="/dashboard" />;
     }
@@ -95,17 +42,15 @@ export const Users = () => {
                 )}
             </div>
 
-            {/* Botón flotante para abrir modal de añadir usuario */}
             <FloatingButton onClick={onOpenModal} icon={faUserPlus} />
 
-            {/* Modal para añadir o editar usuario */}
             <UserFormModal
                 open={open}
                 onClose={onCloseModal}
                 onSubmit={handleSubmit}
                 user={newUser}
                 setUser={setNewUser}
-                isEditing={!!editingUserId}
+                isEditing={isEditing}
             />
         </div>
     );
