@@ -14,7 +14,7 @@ export const CEFApp = () => {
     const unsubscribe = onAuthStateChanged(FirebaseAuth, async (user) => {
       if (user) {
         // Si el usuario está autenticado, obtenemos su información adicional de Firestore
-        const { uid, email, photoUrl } = user;
+        const { uid, email } = user;
         const userDoc = await getUserFromFirestore(uid);  // Obtener más datos si tienes una colección de 'users'
 
         dispatch(login({

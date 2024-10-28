@@ -93,7 +93,7 @@ export const Insights = () => {
   return (
     <div className="container mx-auto p-6 bg-gray-50 rounded-lg shadow-lg flex flex-col md:flex-row">
       <div className="w-full md:w-3/4">
-        <h1 className="text-4xl font-extrabold text-gray-800 mb-6">Prueba de que funciona el deploy</h1>
+        <h1 className="text-4xl font-extrabold text-gray-800 mb-6">Insights</h1>
 
         {/* Guía de colores para los botones */}
         <div className="flex items-center space-x-6 mb-8">
