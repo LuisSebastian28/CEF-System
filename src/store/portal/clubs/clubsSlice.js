@@ -37,10 +37,10 @@ export const clubsSlice = createSlice({
             state.status = "failed";
             state.error = action.payload;
         },
-        fetchClubsSuccess(state, action) {
-            state.status = 'succeeded';
-            state.clubs = action.payload;
-        },
+        // fetchClubsSuccess(state, action) {
+        //     state.status = 'succeeded';
+        //     state.clubs = action.payload;
+        // },
         deleteClub(state, action) {
             state.clubs = state.clubs.filter(club => club.id !== action.payload);
         },

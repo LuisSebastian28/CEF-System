@@ -66,7 +66,7 @@ export const Login = ({ handleLogin }) => {
                                 name="password"
                                 onChange={onInputChange}
                             />
-                            <a href="#" className="text-blue-500 text-sm hover:text-blue-700">Forgot your password?</a>
+                            <a href="/" className="text-blue-500 text-sm hover:text-blue-700">Forgot your password?</a>
                         </div>
                         {errorMessage && <p className="text-red-500 text-xs italic">{errorMessage}</p>}
                         <div className="flex items-center justify-between">

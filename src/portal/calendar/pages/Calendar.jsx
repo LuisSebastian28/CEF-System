@@ -10,7 +10,7 @@ const localizer = momentLocalizer(moment);
 
 export const CalendarPage = () => {
   const dispatch = useDispatch();
-  const { events, status, error } = useSelector((state) => state.events);
+  const { events } = useSelector((state) => state.events);
   const { uid } = useSelector(state => state.auth);
 
   const initialEventState = {

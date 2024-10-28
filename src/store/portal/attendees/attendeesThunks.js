@@ -6,10 +6,6 @@ import {  getAttendeesForClub,
 import {   fetchAttendeesStart,
   fetchAttendeesSuccess,
   fetchAttendeesFailure,
-  addAttendeeStart,
-  addAttendeeFailure,
-  editAttendeeStart,
-  editAttendeeFailure,
   deleteAttendeeStart,
   deleteAttendeeFailure } from './attendeesSlice';
 
