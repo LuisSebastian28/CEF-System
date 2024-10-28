@@ -39,3 +39,5 @@ export const CEFApp = () => {
     <CefRouter />
   );
 };
+
+export default CEFApp;
