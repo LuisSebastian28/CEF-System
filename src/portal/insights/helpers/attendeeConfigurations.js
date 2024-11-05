@@ -37,6 +37,7 @@ export const attendeeConfigurations = {
             // Agrega otras validaciones según sea necesario
         },
     },
+    
     goodnewsclub: {
         fields: [
             'address', 'age', 'assurance', 'church', 'county', 'date', 'guardian', 'name', 'profession'
