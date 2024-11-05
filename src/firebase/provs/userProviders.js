@@ -64,10 +64,12 @@ export const deleteUserFromFirestore = async (userId) => {
     }
 };
 
-// Obtener datos de un usuario dado una referencia (path)
-export const getUserFromReference = async (userRef) => {
+
+
+export const getUserFromId = async (userId) => {
     try {
-        const userDoc = await getDoc(userRef);
+        const userDocRef = doc(FirebaseDB, 'users', userId);
+        const userDoc = await getDoc(userDocRef);
         if (userDoc.exists()) {
             return { ok: true, user: { id: userDoc.id, ...userDoc.data() } };
         } else {
@@ -78,3 +80,4 @@ export const getUserFromReference = async (userRef) => {
         return { ok: false, errorMessage: error.message };
     }
 };
+

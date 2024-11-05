@@ -62,40 +62,7 @@ export const Resources = () => {
     return (
         <div className="flex h-screen bg-gray-100 relative">
             {/* Barra lateral de filtros */}
-            <div className="w-64 bg-white p-4 shadow-lg ">
-                <h2 className="text-xl font-semibold text-gray-700 mb-4">Filter Resources</h2>
-                <div className="space-y-3">
-                    <button
-                        onClick={() => setSelectedFilter('all')}
-                        className={`w-full text-left px-4 py-2 rounded-lg font-medium transition-colors ${selectedFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
-                            }`}
-                    >
-                        All Files
-                    </button>
-                    <button
-                        onClick={() => setSelectedFilter('documents')}
-                        className={`w-full text-left px-4 py-2 rounded-lg font-medium transition-colors ${selectedFilter === 'documents' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
-                            }`}
-                    >
-                        Documents
-                    </button>
-                    <button
-                        onClick={() => setSelectedFilter('video')}
-                        className={`w-full text-left px-4 py-2 rounded-lg font-medium transition-colors ${selectedFilter === 'video' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
-                            }`}
-                    >
-                        Videos
-                    </button>
-                    <button
-                        onClick={() => setSelectedFilter('audio')}
-                        className={`w-full text-left px-4 py-2 rounded-lg font-medium transition-colors ${selectedFilter === 'audio' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
-                            }`}
-                    >
-                        Audios
-                    </button>
-                </div>
-            </div>
-
+            
             {/* Contenido principal */}
             <div className="flex-grow flex flex-col">
                 <header className="bg-blue-600 text-white py-6  shadow-md mb-4 px-6">
@@ -132,6 +99,39 @@ export const Resources = () => {
                     </svg>
                 </span>
             </button>
+            <div className="w-64 bg-white p-4 shadow-lg ">
+                <h2 className="text-xl font-semibold text-gray-700 mb-4">Filter Resources</h2>
+                <div className="space-y-3">
+                    <button
+                        onClick={() => setSelectedFilter('all')}
+                        className={`w-full text-left px-4 py-2 rounded-lg font-medium transition-colors ${selectedFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+                            }`}
+                    >
+                        All Files
+                    </button>
+                    <button
+                        onClick={() => setSelectedFilter('documents')}
+                        className={`w-full text-left px-4 py-2 rounded-lg font-medium transition-colors ${selectedFilter === 'documents' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+                            }`}
+                    >
+                        Documents
+                    </button>
+                    <button
+                        onClick={() => setSelectedFilter('video')}
+                        className={`w-full text-left px-4 py-2 rounded-lg font-medium transition-colors ${selectedFilter === 'video' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+                            }`}
+                    >
+                        Videos
+                    </button>
+                    <button
+                        onClick={() => setSelectedFilter('audio')}
+                        className={`w-full text-left px-4 py-2 rounded-lg font-medium transition-colors ${selectedFilter === 'audio' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+                            }`}
+                    >
+                        Audios
+                    </button>
+                </div>
+            </div>
 
 
             {/* Modal de subida */}

@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { startLoginWithEmailPassword } from '../../store/auth/thunks';
 
 export const useLogin = () => {
@@ -10,9 +11,14 @@ export const useLogin = () => {
 
   const handleLogin = (email, password) => {
     dispatch(startLoginWithEmailPassword({ email, password }));
-    const from = location.state?.from?.pathname || '/dashboard';
-    navigate(from);
   };
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
+    }
+  }, [status, navigate, location]);
 
   return {
     status,

@@ -59,7 +59,11 @@ export const startFetchClubs = () => {
       
       if (result.ok) {
         // Traer solo los datos del club sin procesar asistentes o misioneros
-        dispatch(fetchClubsSuccess(result.clubs));
+        const serializedClubs = result.clubs.map((club) => ({
+          ...club,
+          missionary:club.missionary ? club.missionary.id : null,
+        }))
+        dispatch(fetchClubsSuccess(serializedClubs));
       } else {
         dispatch(fetchClubsFailure(result.errorMessage));
       }

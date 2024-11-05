@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { formFields } from '../../../portal/forms/helpers/formConfigs';
-import { getUserFromReference } from '../../../firebase/provs/userProviders';
+import { getUserFromId } from '../../../firebase/provs/userProviders';
 import { useDispatch } from 'react-redux';
 import { startUpdateClub } from '../../../store/portal/clubs/clubsThunks';
 
@@ -36,7 +36,7 @@ export const ClubEditModal = ({ club, isOpen, onClose }) => {
   useEffect(() => {
     const fetchMissionary = async () => {
       if (club?.missionary && typeof club.missionary === 'object') {
-        const result = await getUserFromReference(club.missionary);
+        const result = await getUserFromId(club.missionary);
         if (result.ok) {
           setMissionaryData(result.user);
         } else {

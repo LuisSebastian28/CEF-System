@@ -1,21 +1,25 @@
 // src/portal/components/ContactModal.js
 import React from 'react';
 import emailjs from 'emailjs-com';
+import { useSelector } from 'react-redux';
 
 export const ContactModal = ({ isOpen, onClose, selectedTeacher, message, setMessage }) => {
+    const { email: userEmail } = useSelector((state) => state.auth); // Extrae el email del usuario autenticado
 
     const handleSendEmail = () => {
         const templateParams = {
+            from_name: 'CEF',  // Cambia esto al nombre que prefieras mostrar
+            from_email: userEmail,       // Email del usuario logueado
             to_name: selectedTeacher.firstName,
             to_email: selectedTeacher.email,
             message,
         };
 
         emailjs.send(
-            'service_sjcoiua', // Reemplaza con tu Service ID de EmailJS
-            'your_template_id', // Reemplaza con tu Template ID de EmailJS
+            'service_sjcoiua',   // Reemplaza con tu Service ID de EmailJS
+            'template_mtmqh0i',  // Reemplaza con tu Template ID de EmailJS
             templateParams,
-            'your_user_id' // Reemplaza con tu User ID de EmailJS
+            '7vhI47u_iTotoLU8x'       // Reemplaza con tu User ID de EmailJS
         )
         .then((response) => {
             console.log('SUCCESS!', response.status, response.text);

@@ -19,27 +19,27 @@ export const addEventToFirestore = async (eventData) => {
 
 export const getEventsFromFirestore = async () => {
     try {
-        const eventsRef = collection(FirebaseDB, "events");
-        const q = query(eventsRef, orderBy("start", "asc"));
-        const querySnapshot = await getDocs(q);
-
-        const events = [];
-        querySnapshot.forEach((doc) => {
-            const event = doc.data();
-            events.push({
-                id: doc.id,
-                ...event,
-                start: event.start.toDate(), // Convertir Timestamp a Date
-                end: event.end.toDate(),     // Convertir Timestamp a Date
-            });
-        });
-
-        return { ok: true, events };
+      const eventsRef = collection(FirebaseDB, "events");
+      const q = query(eventsRef, orderBy("start", "asc"));
+      const querySnapshot = await getDocs(q);
+  
+      const events = querySnapshot.docs.map((doc) => {
+        const event = doc.data();
+        return {
+          id: doc.id,
+          ...event,
+          start: event.start.toDate(), // Convertir Timestamp a Date
+          end: event.end.toDate(),     // Convertir Timestamp a Date
+        };
+      });
+  
+      return { ok: true, events };
     } catch (error) {
-        console.error("Error fetching events: ", error);
-        return { ok: false, errorMessage: error.message };
+      console.error("Error fetching events: ", error);
+      return { ok: false, errorMessage: error.message };
     }
-};
+  };
+  
 
 // Función para actualizar un evento en Firestore
 

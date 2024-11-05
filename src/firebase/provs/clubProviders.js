@@ -21,15 +21,20 @@ export const getClubsFromFirestore = async () => {
 
 // Función para añadir un nuevo club a Firestore
 export const addClubToFirestore = async (clubData) => {
-    console.log(clubData)
-    try {
+  try {
+      // Crea la referencia al misionero
+      if (clubData.missionary) {
+          clubData.missionary = doc(FirebaseDB, 'users', clubData.missionary);
+      }
+      
       const docRef = await addDoc(collection(FirebaseDB, "clubs"), clubData);
       return { ok: true, club: { id: docRef.id, ...clubData } };
-    } catch (error) {
+  } catch (error) {
       console.error("Error creating club: ", error);
       return { ok: false, errorMessage: error.message };
-    }
-  };
+  }
+};
+
 
 
 // Función para eliminar un club de Firestore
@@ -46,12 +51,22 @@ export const deleteClubFromFirestore = async (clubId) => {
 
   export const updateClubInFirestore = async (clubId, updatedData) => {
     try {
-      // Referencia al documento del club específico
       const clubDocRef = doc(FirebaseDB, "clubs", clubId);
   
-      // Actualizar el documento en Firestore con los nuevos datos
-      await updateDoc(clubDocRef, updatedData);
+      // Convertir `missionary` a referencia si es un ID de usuario (string)
+      const dataToUpdate = {
+        ...updatedData,
+        missionary: typeof updatedData.missionary === 'string'
+          ? doc(FirebaseDB, 'users', updatedData.missionary)
+          : updatedData.missionary,
+      };
   
+      // Filtrar valores `undefined`
+      const dataWithoutUndefined = Object.fromEntries(
+        Object.entries(dataToUpdate).filter(([_, value]) => value !== undefined)
+      );
+  
+      await updateDoc(clubDocRef, dataWithoutUndefined);
       return { ok: true };
     } catch (error) {
       console.error("Error updating club:", error);

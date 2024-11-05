@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { formFields } from '../../../portal/forms/helpers/formConfigs';
-import { getUserFromReference } from '../../../firebase/provs/userProviders';
+import { getUserFromId } from '../../../firebase/provs/userProviders';
 
 export const ClubDetailsModal = ({ club, isOpen, onClose }) => {
   const [missionaryData, setMissionaryData] = useState(null);
@@ -29,8 +29,9 @@ export const ClubDetailsModal = ({ club, isOpen, onClose }) => {
 
   useEffect(() => {
     const fetchMissionary = async () => {
-      if (club?.missionary && typeof club.missionary === 'object') {
-        const result = await getUserFromReference(club.missionary);
+      // Verifica que `club.missionary` sea un ID (string) válido
+      if (club?.missionary && typeof club.missionary === 'string') {
+        const result = await getUserFromId(club.missionary);
         if (result.ok) {
           setMissionaryData(result.user);
         } else {
@@ -40,8 +41,10 @@ export const ClubDetailsModal = ({ club, isOpen, onClose }) => {
         setMissionaryData(null);
       }
     };
+  
     fetchMissionary();
   }, [club]);
+  
 
   if (!isOpen || !club) return null;
 

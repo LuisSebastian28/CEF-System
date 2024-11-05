@@ -5,13 +5,23 @@ import { eventsLoading, eventsReceived, eventsFailed, eventAdded, eventUpdated, 
 // Thunk para cargar eventos
 export const fetchEvents = () => async (dispatch) => {
   dispatch(eventsLoading());
+  
   const { ok, events, errorMessage } = await getEventsFromFirestore();
+  
   if (ok) {
-    dispatch(eventsReceived(events));
+    // Convertir `start` y `end` a cadenas de texto en formato ISO
+    const serializedEvents = events.map((event) => ({
+      ...event,
+      start: event.start.toISOString(),
+      end: event.end.toISOString(),
+    }));
+    
+    dispatch(eventsReceived(serializedEvents));
   } else {
     dispatch(eventsFailed(errorMessage));
   }
 };
+
 
 // Thunk para añadir un evento
 export const addEvent = (eventData) => async (dispatch) => {

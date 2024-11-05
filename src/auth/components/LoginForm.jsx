@@ -1,12 +1,10 @@
-import React, { useMemo } from 'react';
-import { useForm } from '../../hooks/useForm';
+import React, { useState, useMemo } from 'react';
 import { useLogin } from '../hooks/useLogin';
-
-const formData = { email: '', password: '' };
 
 export const LoginForm = () => {
   const { status, errorMessage, handleLogin } = useLogin();
-  const { email, password, onInputChange } = useForm(formData);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const isAuthenticating = useMemo(() => status === 'checking', [status]);
 
   const handleSubmit = (e) => {
@@ -27,7 +25,7 @@ export const LoginForm = () => {
           className="shadow appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
           placeholder="Email Address"
           name="email"
-          onChange={onInputChange}
+          onChange={(e) => setEmail(e.target.value)}
         />
       </div>
       <div className="mb-6">
@@ -41,7 +39,7 @@ export const LoginForm = () => {
           className="shadow appearance-none border rounded w-full py-2 px-3 text-black mb-3 leading-tight focus:outline-none focus:shadow-outline"
           placeholder="************"
           name="password"
-          onChange={onInputChange}
+          onChange={(e) => setPassword(e.target.value)}
         />
         <a href="/" className="text-blue-500 text-sm hover:text-blue-700">Forgot your password?</a>
       </div>
