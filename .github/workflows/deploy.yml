@@ -6,8 +6,29 @@ on:
       - main  # O la rama en la que deseas hacer el deploy
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'  # Cambia a la versión que uses en tu proyecto
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+        env:
+          CI: true  # Evita que Jest espere interacciones de usuario
+
   deploy:
     runs-on: ubuntu-latest
+    needs: test  # Corre este trabajo solo si los tests pasan
 
     steps:
       - name: Checkout code

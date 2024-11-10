@@ -60,7 +60,7 @@ export const startAddUser = (user) => {
 
             dispatch(addUserSuccess({ id: uid, ...userWithoutPassword }));  // Aquí usamos el uid del auth
         } catch (error) {
-            console.error("Error adding user:", error.message);
+            // console.error("Error adding user:", error.message);
             dispatch(addUserFailure(error.message));
         }
     };
