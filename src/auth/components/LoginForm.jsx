@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useLogin } from '../hooks/useLogin';
 
 export const LoginForm = () => {
-  const { status, errorMessage, handleLogin } = useLogin();
+  const { status, handleLogin } = useLogin();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const isAuthenticating = useMemo(() => status === 'checking', [status]);

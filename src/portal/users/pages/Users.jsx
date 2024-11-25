@@ -3,7 +3,6 @@ import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import { UserList } from '../components/UserList';
 import { UserFormModal } from '../components/UserFormModal';
 import { FloatingButton } from '../components/FloatingButton';
-import { Navigate } from 'react-router-dom';
 import { useUsers } from '../hooks/useUsers';
 
 export const Users = () => {
