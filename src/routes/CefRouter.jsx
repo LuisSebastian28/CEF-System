@@ -9,7 +9,9 @@ export const CefRouter = () => {
   const location = useLocation(); // Para guardar la ubicación actual
 
   if (isLoading) {
-    return <div>Loading...</div>; // Mostrar un indicador de carga mientras se verifica la autenticación
+    return <div className="flex items-center justify-center h-screen bg-gray-50">
+    <p className="text-2xl font-semibold text-gray-500">Loading ...</p>
+</div>; // Mostrar un indicador de carga mientras se verifica la autenticación
   }
 
   return (

@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from '../../../hooks/useForm';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
+import Swal from 'sweetalert2';
 import { startCreateClub } from '../../../store/portal/clubs/clubsThunks';
 import { startFetchUsers } from '../../../store/portal/users/userThunks';
 import { formFields } from '../helpers/formConfigs';
 
+
 export const ClubForm = ({ eventType }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { users, status: usersStatus } = useSelector((state) => state.users);
   const config = formFields[eventType];
-  
+
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const {
@@ -26,14 +31,37 @@ export const ClubForm = ({ eventType }) => {
     }
   }, [usersStatus, dispatch]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitted(true);
 
     if (isFormValid) {
-      dispatch(startCreateClub(formState));
-      onResetForm();
-      setIsSubmitted(false);
+      try {
+        await dispatch(startCreateClub(formState));
+        onResetForm();
+        setIsSubmitted(false);
+
+        // SweetAlert para éxito
+        Swal.fire({
+          title: 'Club Created!',
+          text: 'You can go to insights to see your Club, camp or class.',
+          icon: 'success',
+          confirmButtonText: 'Go to Insights',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Redirige o realiza otra acción si el usuario confirma
+            navigate('/insights');
+          }
+        });
+      } catch (error) {
+        // SweetAlert para error
+        Swal.fire({
+          title: 'Error',
+          text: 'There was an issue creating the club. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'Retry',
+        });
+      }
     }
   };
 

@@ -13,16 +13,16 @@ export const PortalLayout = () => {
     };
 
     return (
-        <div className="flex h-screen">
+        <div className="flex h-screen flex-col lg:flex-row">
             {/* Botón hamburguesa para pantallas pequeñas */}
             <button
                 onClick={toggleSidebar}
-                className="lg:hidden absolute top-4 left-4 text-2xl z-20"
+                className="lg:hidden text-2xl z-20 p-4 bg-dark-blue-900 text-white"
             >
                 <FontAwesomeIcon icon={faBars} />
             </button>
 
-            {/* Sidebar como caja con ancho fijo o desplegable en mobile */}
+            {/* Sidebar como caja con ancho fijo o navbar en mobile */}
             <SideBar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
             {/* Contenido principal como caja flexible */}

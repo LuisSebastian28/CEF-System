@@ -7,7 +7,7 @@ import UploadModal from '../components/UploadModal'; // Importa el componente de
 
 export const Resources = () => {
     const dispatch = useDispatch();
-    const { driveFiles, firebaseFiles, loading, error } = useSelector((state) => state.resources);
+    const { driveFiles, firebaseFiles, error } = useSelector((state) => state.resources);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedFilter, setSelectedFilter] = useState('all');
     const [showUploadModal, setShowUploadModal] = useState(false); // Estado para controlar el modal
@@ -17,19 +17,22 @@ export const Resources = () => {
         dispatch(fetchFirebaseStorageResources());
     }, [dispatch]);
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-screen bg-gray-50">
-                <p className="text-2xl font-semibold text-gray-500">Loading resources...</p>
-            </div>
-        );
-    }
+    // if (loading) {
+    //     return (
+    //         <div className="flex items-center justify-center h-screen bg-gray-50">
+    //             <p className="text-2xl font-semibold text-gray-500">Loading resources...</p>
+    //         </div>
+    //     );
+    // }
 
     if (error) {
         return <p className="text-center text-red-500 text-xl">{error}</p>;
     }
 
-    const allFiles = [...driveFiles, ...firebaseFiles];
+    const allFiles = [
+        ...driveFiles.map((file) => ({ ...file, source: 'drive' })), // Agrega 'source: drive' a cada archivo de Google Drive
+        ...firebaseFiles.map((file) => ({ ...file, source: 'firebase' })), // Agrega 'source: firebase' a cada archivo de Firebase
+    ];
     const filteredFiles = allFiles.filter((file) =>
         file.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -62,7 +65,7 @@ export const Resources = () => {
     return (
         <div className="flex h-screen bg-gray-100 relative">
             {/* Barra lateral de filtros */}
-            
+
             {/* Contenido principal */}
             <div className="flex-grow flex flex-col">
                 <header className="bg-blue-600 text-white py-6  shadow-md mb-4 px-6">
@@ -77,13 +80,15 @@ export const Resources = () => {
 
                 <div className="flex-grow overflow-y-auto p-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {displayedFiles.length === 0 ? (
-                            <p className="text-center text-gray-500 text-xl col-span-full">No matching resources found.</p>
-                        ) : (
-                            displayedFiles.map((file, index) => (
-                                <ResourceCard key={index} file={file} type={file.mimeType.split('/')[0]} />
-                            ))
-                        )}
+                        {displayedFiles.map((file, index) => (
+                            <ResourceCard
+                                key={index}
+                                file={file}
+                                type={file.mimeType.split('/')[0]}
+                                source={file.source} // Pasa la fuente como prop
+                            />
+                        ))}
+
                     </div>
                 </div>
             </div>

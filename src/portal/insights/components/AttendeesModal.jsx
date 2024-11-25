@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Swal from 'sweetalert2';
 import { startFetchAttendees, startAddAttendee, startEditAttendee, startDeleteAttendee } from '../../../store/portal/attendees/attendeesThunks';
 import { attendeeConfigurations } from '../helpers/attendeeConfigurations';
 
@@ -37,12 +38,24 @@ export const AttendeesModal = ({ club, isOpen, onClose }) => {
 
         const result = await dispatch(thunk);
         if (result.ok) {
-            alert(`Attendee ${isEditing ? 'updated' : 'added'} successfully!`);
+            Swal.fire({
+                title: isEditing ? 'Attendee Updated!' : 'Attendee Added!',
+                text: isEditing
+                    ? 'The attendee has been successfully updated.'
+                    : 'The attendee has been successfully added.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+            });
             setIsAdding(false);
             setIsEditing(false);
             setFormValues(config.initialValues);
         } else {
-            alert(`Error ${isEditing ? 'updating' : 'adding'} attendee: ${result.errorMessage}`);
+            Swal.fire({
+                title: 'Error',
+                text: result.errorMessage || `There was a problem ${isEditing ? 'updating' : 'adding'} the attendee.`,
+                icon: 'error',
+                confirmButtonText: 'Retry',
+            });
         }
     };
 
@@ -56,14 +69,33 @@ export const AttendeesModal = ({ club, isOpen, onClose }) => {
     };
 
     const handleDelete = async (attendeeId) => {
-        if (window.confirm('Are you sure you want to delete this attendee?')) {
-            const result = await dispatch(startDeleteAttendee(club.id, attendeeId));
-            if (result.ok) {
-                alert('Attendee deleted successfully!');
-            } else {
-                alert(`Error deleting attendee: ${result.errorMessage}`);
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'This action cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                const deleteResult = await dispatch(startDeleteAttendee(club.id, attendeeId));
+                if (deleteResult.ok) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'The attendee has been successfully deleted.',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: deleteResult.errorMessage || 'There was a problem deleting the attendee.',
+                        icon: 'error',
+                        confirmButtonText: 'Retry',
+                    });
+                }
             }
-        }
+        });
     };
 
     const closeFormModal = () => {

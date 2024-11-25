@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { startFetchUsers, startAddUser, startUpdateUser, startDeleteUser } from '../../../store/portal/users/userThunks';
+import Swal from 'sweetalert2';
+import {
+    startFetchUsers,
+    startAddUser,
+    startUpdateUser,
+    startDeleteUser
+} from '../../../store/portal/users/userThunks';
 
 export const useUsers = () => {
     const dispatch = useDispatch();
     const { users, status, error } = useSelector((state) => state.users);
-    const { roleDesc } = useSelector(state => state.auth); 
+    const { roleDesc } = useSelector((state) => state.auth);
     const allowedRoles = ['IT Department', 'Director', 'Assistant-Director'];
     const hasAccess = allowedRoles.includes(roleDesc);
 
@@ -42,14 +48,35 @@ export const useUsers = () => {
         setEditingUserId(null);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (editingUserId) {
-            dispatch(startUpdateUser(editingUserId, newUser));
-        } else {
-            dispatch(startAddUser(newUser));
+        try {
+            if (editingUserId) {
+                await dispatch(startUpdateUser(editingUserId, newUser));
+                Swal.fire({
+                    title: 'User Updated',
+                    text: 'The user information has been updated successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                await dispatch(startAddUser(newUser));
+                Swal.fire({
+                    title: 'User Added',
+                    text: 'The new user has been added successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            }
+            onCloseModal();
+        } catch (error) {
+            Swal.fire({
+                title: 'Error',
+                text: 'There was a problem processing your request.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
         }
-        onCloseModal();
     };
 
     const handleEdit = (user) => {
@@ -65,9 +92,33 @@ export const useUsers = () => {
         onOpenModal();
     };
 
-    const handleDelete = (userId) => {
-        if (window.confirm("Are you sure you want to delete this user?")) {
-            dispatch(startDeleteUser(userId));
+    const handleDelete = async (userId) => {
+        const confirmation = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'This action cannot be undone!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel'
+        });
+
+        if (confirmation.isConfirmed) {
+            try {
+                await dispatch(startDeleteUser(userId));
+                Swal.fire({
+                    title: 'Deleted',
+                    text: 'The user has been removed successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'There was a problem deleting the user.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
         }
     };
 

@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { formFields } from '../../../portal/forms/helpers/formConfigs';
 import { getUserFromId } from '../../../firebase/provs/userProviders';
 import { useDispatch } from 'react-redux';
+import Swal from 'sweetalert2';
 import { startUpdateClub } from '../../../store/portal/clubs/clubsThunks';
 
 export const ClubEditModal = ({ club, isOpen, onClose }) => {
-
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({});
   const [missionaryData, setMissionaryData] = useState(null);
@@ -35,7 +35,7 @@ export const ClubEditModal = ({ club, isOpen, onClose }) => {
 
   useEffect(() => {
     const fetchMissionary = async () => {
-      if (club?.missionary && typeof club.missionary === 'object') {
+      if (club?.missionary && typeof club.missionary === 'string') {
         const result = await getUserFromId(club.missionary);
         if (result.ok) {
           setMissionaryData(result.user);
@@ -54,9 +54,24 @@ export const ClubEditModal = ({ club, isOpen, onClose }) => {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSaveChanges = () => {
-    dispatch(startUpdateClub(club.id, formData));
-    onClose(); // Cerrar el modal después de guardar los cambios
+  const handleSaveChanges = async () => {
+    try {
+      await dispatch(startUpdateClub(club.id, formData));
+      Swal.fire({
+        title: 'Club Updated!',
+        text: 'The changes have been saved successfully.',
+        icon: 'success',
+        confirmButtonText: 'OK',
+      });
+      onClose();
+    } catch (error) {
+      Swal.fire({
+        title: 'Error',
+        text: 'There was a problem updating the club. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'Retry',
+      });
+    }
   };
 
   if (!isOpen || !club) return null;

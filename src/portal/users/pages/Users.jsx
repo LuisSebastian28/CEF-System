@@ -24,7 +24,9 @@ export const Users = () => {
     } = useUsers();
 
     if (!hasAccess) {
-        return <Navigate to="/dashboard" />;
+        return <div className="flex items-center justify-center h-screen bg-gray-50">
+            <p className="text-2xl font-semibold text-gray-500">You don't have access contact to IT Department</p>
+        </div>;;
     }
 
     return (

@@ -33,11 +33,11 @@ const generatePassword = () => {
 // Thunk para agregar un nuevo usuario
 export const startAddUser = (user) => {
     return async (dispatch) => {
+        // Temporariamente ignora cambios en onAuthStateChanged
+        const previousAuthState = FirebaseAuth.currentUser;
         dispatch(addUserStart());
-        // Genera una contraseña aleatoria
-        const password = generatePassword(); 
         try {
-            // Crea el usuario en Firebase Authentication
+            const password = generatePassword();
             const { ok, uid, errorMessage } = await registerUserWithEmailPassword({
                 email: user.email,
                 password,
@@ -45,27 +45,24 @@ export const startAddUser = (user) => {
 
             if (!ok) throw new Error(errorMessage);
 
-            // Agrega el usuario a Firestore usando el `uid` como el ID del documento
-            const userWithoutPassword = { 
-                ...user, 
-                uid, 
-                photoUrl: "https://firebasestorage.googleapis.com/v0/b/employee-portal-8f758.appspot.com/o/profile-pictures%2Fgeneric-profile.jpg?alt=media&token=1b5dc905-b829-4379-9f0a-56b34f72e628" 
+            const userWithoutPassword = {
+                ...user,
+                uid,
+                photoUrl: "https://link/to/default/photo.jpg",
             };
-            const result = await addUserToFirestore(userWithoutPassword);
-
-            if (!result.ok) throw new Error(result.errorMessage);
-
-            // Envía el correo de restablecimiento de contraseña
+            await addUserToFirestore(userWithoutPassword);
             await sendPasswordResetEmail(FirebaseAuth, user.email);
+            dispatch(addUserSuccess({ id: uid, ...userWithoutPassword }));
 
-            dispatch(addUserSuccess({ id: uid, ...userWithoutPassword }));  // Aquí usamos el uid del auth
+            // Restaurar estado de autenticación si cambió
+            if (FirebaseAuth.currentUser?.uid !== previousAuthState?.uid) {
+                await FirebaseAuth.updateCurrentUser(previousAuthState);
+            }
         } catch (error) {
-            // console.error("Error adding user:", error.message);
             dispatch(addUserFailure(error.message));
         }
     };
 };
-
 // Thunk para obtener usuarios existentes
 export const startFetchUsers = () => {
     return async (dispatch) => {

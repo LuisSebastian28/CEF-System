@@ -5,22 +5,22 @@ import { startFetchDashboardData } from '../../../store/portal/dashboard/dashboa
 import { BarChartSection } from '../components/BarChartSection';
 
 // Importa el componente `StatCard` correctamente si está en components
-import { StatCard } from '../components/StatCard'; 
+import { StatCard } from '../components/StatCard';
 
 // Importa todos los componentes de `recharts`
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 export const Dashboard = () => {
   const dispatch = useDispatch();
-  const { 
-    clubComparisonData, 
-    totalAttendees, 
-    currentYearClubsByMonth, 
-    previousYearClubsByMonth, 
-    currentYearAttendeesByMonth, 
-    previousYearAttendeesByMonth, 
-    status, 
-    error 
+  const {
+    clubComparisonData,
+    totalAttendees,
+    currentYearClubsByMonth,
+    previousYearClubsByMonth,
+    currentYearAttendeesByMonth,
+    previousYearAttendeesByMonth,
+    status,
+    error
   } = useSelector(state => state.dashboard);
 
   useEffect(() => {
@@ -29,19 +29,21 @@ export const Dashboard = () => {
     }
   }, [status, dispatch]);
 
-  if (status === 'loading') return <p>Loading...</p>;
+  if (status === 'loading') return <div className="flex items-center justify-center h-screen bg-gray-50">
+    <p className="text-2xl font-semibold text-gray-500">Loading ...</p>
+  </div>;
   if (status === 'failed') return <p>Error: {error}</p>;
 
   return (
     <div className="flex h-screen bg-white">
-      <div className="w-4/5 p-10">
+      <div className="w-full p-10">
         <h1 className="text-4xl font-bold mb-10">Dashboard</h1>
 
         {/* Total Attendees Card */}
-        <StatCard 
-          title="Total Attendees" 
-          value={totalAttendees} 
-          description="Total attendees from all clubs (current and previous year)." 
+        <StatCard
+          title="Total Attendees"
+          value={totalAttendees}
+          description="Total attendees from all clubs (current and previous year)."
         />
 
         {/* Club Comparison Chart */}
@@ -64,19 +66,19 @@ export const Dashboard = () => {
         <div className="bg-white p-5 rounded shadow mt-10">
           <h2 className="text-xl font-bold mb-5">Clubs by Month (2023 & 2024)</h2>
           <div className="grid grid-cols-2 gap-5">
-            <BarChartSection 
-              title="Clubs by Month (2023)" 
-              data={previousYearClubsByMonth} 
-              dataKey="clubs" 
-              barColor="#FFBB28" 
-              name="2023 Clubs" 
+            <BarChartSection
+              title="Clubs by Month (2023)"
+              data={previousYearClubsByMonth}
+              dataKey="clubs"
+              barColor="#FFBB28"
+              name="2023 Clubs"
             />
-            <BarChartSection 
-              title="Clubs by Month (2024)" 
-              data={currentYearClubsByMonth} 
-              dataKey="clubs" 
-              barColor="#0088FE" 
-              name="2024 Clubs" 
+            <BarChartSection
+              title="Clubs by Month (2024)"
+              data={currentYearClubsByMonth}
+              dataKey="clubs"
+              barColor="#0088FE"
+              name="2024 Clubs"
             />
           </div>
         </div>
@@ -85,19 +87,19 @@ export const Dashboard = () => {
         <div className="bg-white p-5 rounded shadow mt-10">
           <h2 className="text-xl font-bold mb-5">Attendees by Month (2023 & 2024)</h2>
           <div className="grid grid-cols-2 gap-5">
-            <BarChartSection 
-              title="Attendees by Month (2023)" 
-              data={previousYearAttendeesByMonth} 
-              dataKey="attendees" 
-              barColor="#FFBB28" 
-              name="2023 Attendees" 
+            <BarChartSection
+              title="Attendees by Month (2023)"
+              data={previousYearAttendeesByMonth}
+              dataKey="attendees"
+              barColor="#FFBB28"
+              name="2023 Attendees"
             />
-            <BarChartSection 
-              title="Attendees by Month (2024)" 
-              data={currentYearAttendeesByMonth} 
-              dataKey="attendees" 
-              barColor="#0088FE" 
-              name="2024 Attendees" 
+            <BarChartSection
+              title="Attendees by Month (2024)"
+              data={currentYearAttendeesByMonth}
+              dataKey="attendees"
+              barColor="#0088FE"
+              name="2024 Attendees"
             />
           </div>
         </div>

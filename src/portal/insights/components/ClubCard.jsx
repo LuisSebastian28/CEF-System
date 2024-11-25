@@ -1,7 +1,6 @@
-// ClubCard.jsx
-
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import Swal from 'sweetalert2';
 import { startDeleteClub } from '../../../store/portal/clubs/clubsThunks';
 
 const eventTypeMapping = {
@@ -15,9 +14,33 @@ const eventTypeMapping = {
 export const ClubCard = ({ club, onViewDetails, onEditClub, onManageAttendees }) => {
   const dispatch = useDispatch();
 
-  const handleDeleteClub = () => {
-    if (window.confirm("Are you sure you want to delete this club?")) {
-      dispatch(startDeleteClub(club.id));
+  const handleDeleteClub = async () => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, cancel',
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await dispatch(startDeleteClub(club.id));
+        Swal.fire({
+          title: 'Club Deleted!',
+          text: 'The club has been deleted successfully.',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        });
+      } catch (error) {
+        Swal.fire({
+          title: 'Error',
+          text: 'There was a problem deleting the club. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'Retry',
+        });
+      }
     }
   };
 
