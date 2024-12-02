@@ -25,7 +25,7 @@ export const SideBar = () => {
             <div className="hidden lg:flex flex-col bg-dark-blue-900 text-white p-2 h-full">
                 <div className='flex flex-col items-center mb-8'>
                     <img src={logo} alt="Logo" className='logo w-20 h-20 mb-3' />
-                    <h2 className='text-xl font-semibold'>Hi, {firstName}</h2>
+                    <h2 className='text-xl font-semibold'>Hi, Sebastian</h2>
                 </div>
                 <nav className='flex flex-col space-y-4'>
                     <Link to="dashboard" className="flex items-center space-x-2 p-3 rounded-lg hover:bg-blue-800">
