@@ -4,11 +4,38 @@ import Swal from 'sweetalert2';
 import { deleteFirebaseResource } from '../../../store/portal/resourcesCef/resourcesThunks';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faCloud, faHardDrive } from '@fortawesome/free-solid-svg-icons';
+import { useResources } from '../hooks/useResources';
 
 export const ResourceCard = ({ file, type, source }) => {
     const dispatch = useDispatch();
+    const { hasAccess } = useResources();
+
     const isGoogleDoc = file.mimeType === 'application/vnd.google-apps.document';
     const downloadUrl = file.url || (isGoogleDoc ? file.webViewLink : file.webContentLink);
+
+    // URLs públicas para imágenes por tipo de archivo
+    const defaultImages = {
+        pdf: 'https://cdn-icons-png.flaticon.com/512/337/337946.png', // Icono PDF
+        image: 'https://cdn-icons-png.flaticon.com/512/337/337940.png', // Icono Imagen
+        video: 'https://cdn-icons-png.flaticon.com/512/337/337953.png', // Icono Video
+        document: 'https://cdn-icons-png.flaticon.com/512/337/337958.png', // Icono Documento
+        spreadsheet: 'https://cdn-icons-png.flaticon.com/512/337/337948.png', // Icono Hoja de Cálculo
+        default: 'https://cdn-icons-png.flaticon.com/512/338/338846.png', // Icono genérico
+    };
+
+    // Selección de imagen por tipo de archivo
+    const mimeTypeMapping = {
+        'application/pdf': 'pdf',
+        'image/': 'image',
+        'video/': 'video',
+        'application/vnd.google-apps.document': 'document',
+        'application/vnd.google-apps.spreadsheet': 'spreadsheet',
+    };
+
+    const fileType =
+        Object.keys(mimeTypeMapping).find((key) => file.mimeType.startsWith(key)) || 'default';
+
+    const thumbnail = file.thumbnailLink || defaultImages[fileType];
 
     const handleDelete = () => {
         if (source === 'drive') {
@@ -40,9 +67,9 @@ export const ResourceCard = ({ file, type, source }) => {
         <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-5 flex flex-col justify-between">
             <div>
                 <img
-                    src={file.thumbnailLink || `/default-${type}-thumbnail.png`}
+                    src={thumbnail}
                     alt={file.name}
-                    className="w-full h-40 object-cover rounded-md mb-3"
+                    className="w-full h-40 object-contain bg-gray-100 rounded-md mb-3"
                 />
                 <h2 className="text-lg font-semibold mb-2 text-gray-800 truncate">{file.name}</h2>
             </div>
@@ -65,12 +92,14 @@ export const ResourceCard = ({ file, type, source }) => {
                 >
                     View
                 </a>
-                <button
-                    onClick={handleDelete}
-                    className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors"
-                >
-                    <FontAwesomeIcon icon={faTrash} />
-                </button>
+                {hasAccess && (
+                    <button
+                        onClick={handleDelete}
+                        className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition-colors"
+                    >
+                        <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                )}
             </div>
         </div>
     );

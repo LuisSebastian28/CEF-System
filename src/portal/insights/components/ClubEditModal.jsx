@@ -23,7 +23,12 @@ export const ClubEditModal = ({ club, isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
-      setFormData(club); // Inicializar datos del formulario con los datos del club actual
+      setFormData((prevData) => ({
+        ...prevData,
+        ...club,
+        date: club.date ? new Date(club.date).toISOString().split('T')[0] : '',
+        time: club.time || '', // Mantén la hora como está si ya es 'HH:mm'
+      }));
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -32,6 +37,8 @@ export const ClubEditModal = ({ club, isOpen, onClose }) => {
       document.body.style.overflow = 'unset';
     };
   }, [isOpen, club]);
+
+
 
   useEffect(() => {
     const fetchMissionary = async () => {
@@ -51,12 +58,24 @@ export const ClubEditModal = ({ club, isOpen, onClose }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: name === 'date' || name === 'time' ? value : value,
+    }));
   };
+
+
 
   const handleSaveChanges = async () => {
     try {
-      await dispatch(startUpdateClub(club.id, formData));
+      const formattedData = {
+        ...formData,
+        date: formData.date, // Ya en 'YYYY-MM-DD'
+        time: formData.time, // Ya en 'HH:mm'
+      };
+  
+      await dispatch(startUpdateClub(club.id, formattedData));
       Swal.fire({
         title: 'Club Updated!',
         text: 'The changes have been saved successfully.',
@@ -73,6 +92,7 @@ export const ClubEditModal = ({ club, isOpen, onClose }) => {
       });
     }
   };
+  
 
   if (!isOpen || !club) return null;
 
@@ -84,12 +104,28 @@ export const ClubEditModal = ({ club, isOpen, onClose }) => {
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-          {config ? (
-            config.fields
-              .filter((field) => field !== 'id' && field !== 'attendance' && field !== 'missionary')
-              .map((field) => (
-                <div key={field} className="border-b pb-2">
-                  <label className="block font-semibold capitalize">{field}:</label>
+          {config.fields
+            .filter((field) => field !== 'id' && field !== 'attendance' && field !== 'missionary')
+            .map((field) => (
+              <div key={field} className="border-b pb-2">
+                <label className="block font-semibold capitalize">{field}:</label>
+                {field === 'date' ? (
+                  <input
+                    type="date"
+                    name={field}
+                    value={formData[field] ? new Date(formData[field]).toISOString().split('T')[0] : ''}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                ) : field === 'time' ? (
+                  <input
+                    type="time"
+                    name={field}
+                    value={formData[field] || ''}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded"
+                  />
+                ) : (
                   <input
                     type="text"
                     name={field}
@@ -97,11 +133,11 @@ export const ClubEditModal = ({ club, isOpen, onClose }) => {
                     onChange={handleInputChange}
                     className="w-full p-2 border rounded"
                   />
-                </div>
-              ))
-          ) : (
-            <p className="col-span-2">Configuration for this club type is not available.</p>
-          )}
+                )}
+
+              </div>
+            ))}
+
 
           {missionaryData && (
             <div className="col-span-2 border-t pt-4">

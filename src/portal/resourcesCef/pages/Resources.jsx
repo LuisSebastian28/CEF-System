@@ -4,6 +4,7 @@ import { fetchResources, fetchFirebaseStorageResources } from '../../../store/po
 import { SearchBar } from '../components/SearchBar';
 import { ResourceCard } from '../components/ResourceCard';
 import UploadModal from '../components/UploadModal'; // Importa el componente del modal de subida
+import { useResources } from '../hooks/useResources';
 
 export const Resources = () => {
     const dispatch = useDispatch();
@@ -11,6 +12,8 @@ export const Resources = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedFilter, setSelectedFilter] = useState('all');
     const [showUploadModal, setShowUploadModal] = useState(false); // Estado para controlar el modal
+
+    const { hasAccess } = useResources();
 
     useEffect(() => {
         dispatch(fetchResources());
@@ -94,16 +97,18 @@ export const Resources = () => {
             </div>
 
             {/* Botón flotante */}
-            <button
-                onClick={() => setShowUploadModal(true)}
-                className="fixed bottom-10 right-10 bg-blue-600 text-white text-4xl rounded-full p-5 shadow-2xl hover:bg-blue-700 focus:outline-none transform transition-transform duration-200 hover:scale-110"
-            >
-                <span className="flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                    </svg>
-                </span>
-            </button>
+            {hasAccess && (
+                <button
+                    onClick={() => setShowUploadModal(true)}
+                    className="fixed bottom-10 right-10 bg-blue-600 text-white text-4xl rounded-full p-5 shadow-2xl hover:bg-blue-700 focus:outline-none transform transition-transform duration-200 hover:scale-110"
+                >
+                    <span className="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </span>
+                </button>
+            )}
             <div className="w-64 bg-white p-4 shadow-lg ">
                 <h2 className="text-xl font-semibold text-gray-700 mb-4">Filter Resources</h2>
                 <div className="space-y-3">
