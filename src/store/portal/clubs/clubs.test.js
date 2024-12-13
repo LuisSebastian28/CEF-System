@@ -1,21 +1,35 @@
-import { 
-    startCreateClub, 
-    startFetchClubs, 
-    startDeleteClub, 
-    startUpdateClub, 
-    startAddAttendee 
+import {
+    startCreateClub,
+    startFetchClubs,
+    startDeleteClub,
+    startUpdateClub,
+    startAddAttendee,
+    startEditAttendee,
+    startDeleteAttendee,
 } from './clubsThunks';
-import { 
-    createClubStart, createClubSuccess, createClubFailure,
-    fetchClubsStart, fetchClubsSuccess, fetchClubsFailure,
+import {
+    createClubStart,
+    createClubSuccess,
+    createClubFailure,
+    fetchClubsStart,
+    fetchClubsSuccess,
+    fetchClubsFailure,
     deleteClub,
-    updateClubStart, updateClubSuccess, updateClubFailure 
+    updateClubStart,
+    updateClubSuccess,
+    updateClubFailure,
 } from './clubsSlice';
-import { 
-    addClubToFirestore, getClubsFromFirestore, 
-    deleteClubFromFirestore, updateClubInFirestore 
+import {
+    addClubToFirestore,
+    getClubsFromFirestore,
+    deleteClubFromFirestore,
+    updateClubInFirestore,
 } from '../../../firebase/provs/clubProviders';
-import { addAttendeeToFirestore } from '../../../firebase/provs/attendeeProviders';
+import {
+    addAttendeeToFirestore,
+    editAttendeeInFirestore,
+    deleteAttendeeFromFirestore,
+} from '../../../firebase/provs/attendeeProviders';
 
 jest.mock('../../../firebase/provs/clubProviders', () => ({
     addClubToFirestore: jest.fn(),
@@ -26,6 +40,8 @@ jest.mock('../../../firebase/provs/clubProviders', () => ({
 
 jest.mock('../../../firebase/provs/attendeeProviders', () => ({
     addAttendeeToFirestore: jest.fn(),
+    editAttendeeInFirestore: jest.fn(),
+    deleteAttendeeFromFirestore: jest.fn(),
 }));
 
 describe('Club Thunks', () => {
@@ -56,20 +72,35 @@ describe('Club Thunks', () => {
         expect(dispatch).toHaveBeenCalledWith(createClubFailure(errorMessage));
     });
 
-    // // Test for startFetchClubs
-    // it('should fetch clubs successfully', async () => {
-    //     const clubs = [{ id: 'club1', name: 'Club A' }, { id: 'club2', name: 'Club B' }];
-    //     getClubsFromFirestore.mockResolvedValueOnce({ ok: true, clubs });
+    // Test for startFetchClubs
+    it('should fetch clubs successfully', async () => {
+        const clubs = [
+            { id: 'club1', name: 'Club A' },
+            { id: 'club2', name: 'Club B' },
+        ];
+        getClubsFromFirestore.mockResolvedValueOnce({ ok: true, clubs });
 
-    //     await startFetchClubs()(dispatch);
+        const expectedClubs = clubs.map((club) => ({ ...club, missionary: null }));
 
-    //     expect(dispatch).toHaveBeenCalledWith(fetchClubsStart());
-    //     expect(dispatch).toHaveBeenCalledWith(fetchClubsSuccess(clubs));
-    // });
+        await startFetchClubs()(dispatch);
+
+        expect(dispatch).toHaveBeenCalledWith(fetchClubsStart());
+        expect(dispatch).toHaveBeenCalledWith(fetchClubsSuccess(expectedClubs));
+    });
 
     it('should handle failure when fetching clubs', async () => {
         const errorMessage = 'Failed to fetch clubs';
         getClubsFromFirestore.mockResolvedValueOnce({ ok: false, errorMessage });
+
+        await startFetchClubs()(dispatch);
+
+        expect(dispatch).toHaveBeenCalledWith(fetchClubsStart());
+        expect(dispatch).toHaveBeenCalledWith(fetchClubsFailure(errorMessage));
+    });
+
+    it('should handle unexpected errors when fetching clubs', async () => {
+        const errorMessage = 'Unexpected error';
+        getClubsFromFirestore.mockRejectedValueOnce(new Error(errorMessage));
 
         await startFetchClubs()(dispatch);
 
@@ -120,16 +151,16 @@ describe('Club Thunks', () => {
         expect(dispatch).toHaveBeenCalledWith(updateClubFailure(errorMessage));
     });
 
-    // // Test for startAddAttendee
-    // it('should add an attendee successfully', async () => {
-    //     const clubId = 'club123';
-    //     const attendeeData = { name: 'John Doe' };
-    //     addAttendeeToFirestore.mockResolvedValueOnce({ ok: true });
+    // Test for attendees
+    it('should add an attendee successfully', async () => {
+        const clubId = 'club123';
+        const attendeeData = { name: 'John Doe' };
+        addAttendeeToFirestore.mockResolvedValueOnce({ ok: true });
 
-    //     await startAddAttendee(clubId, attendeeData)(dispatch);
+        await startAddAttendee(clubId, attendeeData)(dispatch);
 
-    //     expect(dispatch).toHaveBeenCalledWith(startFetchClubs());
-    // });
+        expect(dispatch).toHaveBeenCalledWith(expect.any(Function));
+    });
 
     it('should log an error when adding an attendee fails', async () => {
         console.error = jest.fn();
@@ -141,5 +172,25 @@ describe('Club Thunks', () => {
         await startAddAttendee(clubId, attendeeData)(dispatch);
 
         expect(console.error).toHaveBeenCalledWith(errorMessage);
+    });
+
+    it('should handle editing an attendee successfully', async () => {
+        const clubId = 'club123';
+        const attendeeData = { id: 'attendee123', name: 'John Updated' };
+        editAttendeeInFirestore.mockResolvedValueOnce({ ok: true });
+
+        await startEditAttendee(clubId, attendeeData)(dispatch);
+
+        expect(dispatch).toHaveBeenCalledWith(expect.any(Function));
+    });
+
+    it('should handle deleting an attendee successfully', async () => {
+        const clubId = 'club123';
+        const attendeeId = 'attendee123';
+        deleteAttendeeFromFirestore.mockResolvedValueOnce({ ok: true });
+
+        await startDeleteAttendee(clubId, attendeeId)(dispatch);
+
+        expect(dispatch).toHaveBeenCalledWith(expect.any(Function));
     });
 });
